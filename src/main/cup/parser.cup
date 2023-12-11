@@ -1,0 +1,87 @@
+package org.compiler;
+
+import java_cup.runtime.*;
+
+parser code {:
+    // Connect this parser to a scanner!
+    lexer lex;
+
+    @SuppressWarnings("deprecation")
+    public parser(lexer lex){
+        this.lex=lex;
+        this.symbolFactory = new DefaultSymbolFactory();
+    }
+:}
+
+/* define how to connect to the scanner! */
+init with {: :};
+scan with {: return lex.next_token(); :};
+
+/* Terminales (tokens retornados por el scanner). */
+// Lexema Separador
+terminal PINO;
+// Operadores Aritméticos Binarios ( +, -, *, /, % ):
+terminal DASHER, DANCER, PRANCER, VIXEN, COMET, RUDOLPH;
+// Operadores Aritméticos Unarios ( ++, -- ):
+terminal GRINCH, QUIEN;
+// Operadores Relacionales ( =, !=, >, <, >=, <= ):
+terminal ALABASTER, BUSHY, PEPPER, SUGARPLUM, WUNORSE, JINGLE;
+// Operadores Logicos (&&, ||, !):
+terminal MELCHOR, GASPAR, BALTAZAR;
+// Tipos de Datos ( char, int, float, boolean, string ):
+terminal SANTACLAUS, FATHERCHRISTMAS, KRISKRINGLE, SANNICOLAS, DEDMOROZ;
+// Literales
+terminal char L_SANTACLAUS; // Nuestro scanner provee l_SANTACLAUS como char
+terminal int L_FATHERCHRISTMAS; // Nuestro scanner provee l_SANTACLAUS como int
+terminal float L_KRISKRINGLE; // Nuestro scanner provee l_SANTACLAUS como float
+terminal boolean L_SANNICOLAS; // Nuestro scanner provee l_SANTACLAUS como boolean
+terminal String L_DEDMOROZ; // Nuestro scanner provee l_SANTACLAUS como String
+// Parentesis ( (, ), [, ], {, } ):
+terminal ABRECUENTO, CIERRACUENTO, ABREEMPAQUE, CIERRAEMPAQUE, ABREREGALO, CIERRAREGALO;
+// Lexemas de Estructuras de Control ( if, elif, else, for, do, until, return, break ):
+terminal ELFO, HADA, DUENDE, ENVUELVE, HACE, REVISA, ENVIA, CORTA;
+// Lexemas de Lectura/Escritura ( print, read):
+terminal NARRA, ESCUCHA;
+// Lexema de Fin de Expresión ( | ):
+terminal FINREGALO;
+// Lexema de Asignación ( = ):
+terminal ENTREGA;
+// Identificador ( variable, función):
+terminal PERSONA;
+// EXTRA:
+terminal STATIC;
+
+
+
+// No terminales
+nonterminal miLenguaje, program, declList, decl, varDecl, scopedVarDecm, varDeclList, varDeclInit, varDeclId, typeSpec;
+
+/* Precedences */
+precedence left DASHER, DANCER;
+precedence left PRANCER, VIXEN, COMET;
+
+start with miLenguaje;
+
+miLenguaje ::= {: :};
+
+///* ------------------------------------------- */
+//// 1. programa
+//program ::= decllist;
+//// 2. lista de declaraciones
+//decllist ::= decllist decl | decl;
+//// 3. declaración
+//decl ::= vardecl | fundecl;
+///* ------------------------------------------- */
+//// 4. declaración de variables
+//vardecl ::= typespec vardecllist;
+//// 5. declaracion de variables en scope
+//scopedvardecl ::= typespec vardecllist | typespec vardecllist;
+//// 6. lista de declaración de variables
+//vardecllist ::= vardecllist pino vardeclinit | vardeclinit;
+//// 7.
+//vardeclinit ::= vardeclid | vardeclid entrega simpleexp;
+//// 8.
+//vardeclid ::= persona | persona abreempaque l_fatherchristmas cierraempaque;
+//// 9.
+//typespec ::= santaclaus | fatherchristmas | kriskringle | sannicolas | dedmoroz;
+///* ------------------------------------------- */
