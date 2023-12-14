@@ -27,6 +27,8 @@ negative = (\-)?
 single_line_comment = \@[^\n]*\n
 multi_line_comment = (\/\_)\.*(\_\/)
 comment = {single_line_comment} | {multi_line_comment}
+// Identificador inválido:
+invalid_identifier = [0-9][a-zA-Z0-9_]* | [a-zA-Z_][a-zA-Z0-9_]*[^a-zA-Z0-9_]+[a-zA-Z0-9_]*
 // Identificador:
 identifier = [a-zA-Z_][a-zA-Z0-9_]*
 // Literales:
@@ -104,6 +106,10 @@ l_string = \"
     "|" {return symbol(sym.FINREGALO);}
     // Lexema de Asignación
     "<=" {return symbol(sym.ENTREGA);}
+    {invalid_identifier}  {
+                System.out.println("Error: Valor invalido <" + yytext() + "> en la línea " + yyline + ", columna " + yycolumn);
+                return symbol(sym.error, "Valor invalido <" + yytext() + ">");
+            }
     // Identificador
     {identifier} {return symbol(sym.PERSONA);}
 }

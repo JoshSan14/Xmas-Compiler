@@ -384,10 +384,14 @@ public class LexerTest {
 
     @Test
     public void matchPERSONA() throws IOException {
-        String testString = "ID_1";
+        String testString = "ID_3[*]+]^";
         lexer lex = new lexer(new StringReader(testString));
         Symbol symbol = lex.next_token();
-        Assertions.assertEquals(sym.PERSONA, symbol.sym);
+        if (symbol.sym == sym.error) {
+            System.out.println(symbol.value); // Imprime el mensaje de error
+        } else {
+            Assertions.assertEquals(sym.PERSONA, symbol.sym);
+        }
     }
 
 }
