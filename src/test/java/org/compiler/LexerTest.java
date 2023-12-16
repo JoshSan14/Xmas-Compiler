@@ -1,11 +1,12 @@
 package org.compiler;
 
 import java_cup.runtime.Symbol;
+import ParserLexer.lexer;
+import ParserLexer.sym;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -384,7 +385,7 @@ public class LexerTest {
 
     @Test
     public void matchPERSONA() throws IOException {
-        String testString = "ID_3[*]+]^";
+        String testString = "ID_3";
         lexer lex = new lexer(new StringReader(testString));
         Symbol symbol = lex.next_token();
         if (symbol.sym == sym.error) {

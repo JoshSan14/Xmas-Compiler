@@ -1,4 +1,5 @@
-package org.compiler;
+package ParserLexer;
+import ParserLexer.sym;
 import java_cup.runtime.*;
 
 %%
@@ -69,8 +70,6 @@ l_string = \"
     "^" {return symbol(sym.MELCHOR);}
     "#" {return symbol(sym.GASPAR);}
     "!" {return symbol(sym.BALTAZAR);}
-    // Scope
-    "static" {return symbol(sym.STATIC);}
     // Tipos de Datos
     "char" {return symbol(sym.SANTACLAUS);}
     "int" {return symbol(sym.FATHERCHRISTMAS);}
@@ -106,6 +105,10 @@ l_string = \"
     "|" {return symbol(sym.FINREGALO);}
     // Lexema de Asignación
     "<=" {return symbol(sym.ENTREGA);}
+    // Local
+    "local" {return symbol(sym.LOCAL);}
+    // Funcion
+    "funcion" {return symbol(sym.FUNCTION);}
     {invalid_identifier}  {
                 System.out.println("Error: Valor invalido <" + yytext() + "> en la línea " + yyline + ", columna " + yycolumn);
                 return symbol(sym.error, "Valor invalido <" + yytext() + ">");
