@@ -18,7 +18,7 @@ public class MainJFlexCup {
 
     public void InitLexerParser(String lexerRoute, String[] strArrParser) throws internal_error, Exception {
         Generate_Lexer(lexerRoute);
-        //Generate_Parser(strArrParser);
+        Generate_Parser(strArrParser);
     }
 
     // Genera el archivo del lexer
