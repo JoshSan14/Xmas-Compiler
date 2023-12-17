@@ -1,7 +1,7 @@
 package Compiler;
 import java_cup.Lexer;
 import java_cup.internal_error;
-
+import ParserLexer.lexer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,24 +32,31 @@ public class MainJFlexCup {
     public void LexerTest(String scannerRoute) throws IOException {
         Reader reader = new BufferedReader(new FileReader(scannerRoute));
         reader.read();
-        Lexer lex = new Lexer(reader);
-        int i = 0;
+        lexer lex = new lexer(reader);
+        int totalLexemes = 0;
+        int validLexemes = 0;
+        int invalidLexemes = 0;
         Symbol token;
         while (true){
             token = lex.next_token();
             if(token.sym != 0) {
+                totalLexemes++;
                 System.out.println("Token: " + token.sym + ", Value: " + (token.value==null?lex.yytext():token.value.toString())
                         + ", Line: " + token.left + ", Column: " + token.right);
+                if (token.sym==1){
+                    invalidLexemes++;
+                }else {
+                    validLexemes++;
+                }
             }
             else {
-                System.out.println("Quantity of found lexemes: " + i);
+                System.out.println("Cantidad total de lexemas: " + totalLexemes);
+                System.out.println("Cantidad de lexemas validos: " + validLexemes);
+                System.out.println("Cantidad de lexemas invalidos: " + invalidLexemes);
                 return;
             }
-            i++;
         }
-
     }
-
 
 
 }

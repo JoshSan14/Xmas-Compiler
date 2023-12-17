@@ -1,5 +1,4 @@
 package ParserLexer;
-import ParserLexer.sym;
 import java_cup.runtime.*;
 
 %%
@@ -25,13 +24,21 @@ import java_cup.runtime.*;
 // Regex
 negative = (\-)?
 // Expresiones regulares para comentarios
-single_line_comment = \@[^\n]*\n
-multi_line_comment = (\/\_)\.*(\_\/)
+single_line_comment = \@[^\n]*
+multi_line_comment = \/\_[^]*\_\/
 comment = {single_line_comment} | {multi_line_comment}
-// Identificador inválido:
-invalid_identifier = [0-9][a-zA-Z0-9_]* | [a-zA-Z_][a-zA-Z0-9_]*[^a-zA-Z0-9_]+[a-zA-Z0-9_]*
+// Expresiones regulares para espacio en blanco
+LineTerminator = \r|\n|\r\n
+InputCharacter = [^\r\n]
+WhiteSpace = {LineTerminator} | [ \t\f]
+// Expresion regular que obtiene los caracteres especiales
+caracteresEspeciales = \+|\-|\/|\*|\||\°|\¬|\!|\#|\$|\%|\&|\(|\)|\=|\?|\¡|\¿|\´|\¨|\~|\{|\}|\[|\]|\^|\`|\;|\:|\<|\>|\.|\,+
 // Identificador:
 identifier = [a-zA-Z_][a-zA-Z0-9_]*
+// Identificador no permitido (para manejo de errores):
+secuenciaInvalida = [0-9]+{identifier} | {caracteresEspeciales}+[0-9]*{identifier}
+// Entero pegado a letras (para manejo de errores)
+EnteroConLetras = [0-9]+[a-zA-Z]+
 // Literales:
 l_char = \'[^\']\' // Char
 l_int = {negative}(0|[1-9](\d*)) // Int
@@ -40,6 +47,7 @@ l_boolean = true | false // Bool
 l_string = \"
 
 %state STRING
+%state COMMENT
 
 %%
 
@@ -47,29 +55,9 @@ l_string = \"
 <YYINITIAL> {
     // Comentario
     {comment} { /* ignore */ }
-    // Lexema Separador
-    "," {return symbol(sym.PINO);}
-    // Operadores Aritméticos Binarios
-    "+" {return symbol(sym.DASHER);}
-    "-" {return symbol(sym.DANCER);}
-    "*" {return symbol(sym.PRANCER);}
-    "/" {return symbol(sym.VIXEN);}
-    "~" {return symbol(sym.COMET);}
-    "**" {return symbol(sym.RUDOLPH);}
-    // Operadores Aritméticos Unarios
-    "++" {return symbol(sym.GRINCH);}
-    "--" {return symbol(sym.QUIEN);}
-    // Operadores Relacionales
-    "==" {return symbol(sym.ALABASTER);}
-    "!=" {return symbol(sym.BUSHY);}
-    ">" {return symbol(sym.PEPPER);}
-    "<" {return symbol(sym.SUGARPLUM);}
-    "=>" {return symbol(sym.WUNORSE);}
-    "=<" {return symbol(sym.JINGLE);}
-    // Operadores Lógicos
-    "^" {return symbol(sym.MELCHOR);}
-    "#" {return symbol(sym.GASPAR);}
-    "!" {return symbol(sym.BALTAZAR);}
+    "\/\_" { yybegin(COMMENT); }
+    // Espacio en blanco
+    {WhiteSpace} { /* ignore */ }
     // Tipos de Datos
     "char" {return symbol(sym.SANTACLAUS);}
     "int" {return symbol(sym.FATHERCHRISTMAS);}
@@ -82,7 +70,6 @@ l_string = \"
     {l_float} {return symbol(sym.L_KRISKRINGLE);}
     {l_boolean} {return symbol(sym.L_SANNICOLAS);}
     {l_string} {string.setLength(0); yybegin(STRING);}
-    // Paréntesis
     "(" {return symbol(sym.ABRECUENTO);}
     ")" {return symbol(sym.CIERRACUENTO);}
     "[" {return symbol(sym.ABREEMPAQUE);}
@@ -109,23 +96,67 @@ l_string = \"
     "local" {return symbol(sym.LOCAL);}
     // Funcion
     "funcion" {return symbol(sym.FUNCTION);}
-    {invalid_identifier}  {
-                System.out.println("Error: Valor invalido <" + yytext() + "> en la línea " + yyline + ", columna " + yycolumn);
-                return symbol(sym.error, "Valor invalido <" + yytext() + ">");
-            }
+    // Manejo de errores
+    // Identificador invalido
+    {secuenciaInvalida}  {
+            return symbol(sym.error, "Error: Secuencia de caracteres '" + yytext() + "' no permitida en la línea " + yyline + ", columna " + yycolumn);}
+    // Numero pegado a letras
+    {EnteroConLetras}  {
+          return symbol(sym.error, "Error: Entero no permitido '" + yytext() + "' en la línea " + yyline + ", columna " + yycolumn);
+    }
     // Identificador
     {identifier} {return symbol(sym.PERSONA);}
+    // Caracteres
+    // Lexema Separador
+    "," {return symbol(sym.PINO);}
+    // Operadores Aritméticos Binarios
+    "+" {return symbol(sym.DASHER);}
+    "-" {return symbol(sym.DANCER);}
+    "*" {return symbol(sym.PRANCER);}
+    "/" {return symbol(sym.VIXEN);}
+    "~" {return symbol(sym.COMET);}
+    "**" {return symbol(sym.RUDOLPH);}
+    // Operadores Aritméticos Unarios
+    "++" {return symbol(sym.GRINCH);}
+    "--" {return symbol(sym.QUIEN);}
+    // Operadores Relacionales
+    "==" {return symbol(sym.ALABASTER);}
+    "!=" {return symbol(sym.BUSHY);}
+    ">" {return symbol(sym.PEPPER);}
+    "<" {return symbol(sym.SUGARPLUM);}
+    "=>" {return symbol(sym.WUNORSE);}
+    "=<" {return symbol(sym.JINGLE);}
+    // Operadores Lógicos
+    "^" {return symbol(sym.MELCHOR);}
+    "#" {return symbol(sym.GASPAR);}
+    "!" {return symbol(sym.BALTAZAR);}
 }
 
+// Se maneja el error cuando se obtiene un string sin cerrar
 <STRING> {
-    \"               { yybegin(YYINITIAL); return symbol(sym.L_DEDMOROZ, string.toString()); }
-    [^\n\r\"\\]+     { string.append( yytext() ); }
-    \\t              { string.append('\t'); }
-    \\n              { string.append('\n'); }
-    \\r              { string.append('\r'); }
-    \\\"             { string.append('\"'); }
-    \\               { string.append('\\'); }
+   \"               { yybegin(YYINITIAL); return symbol(sym.L_DEDMOROZ, string.toString()); }
+   [^\n\r\"\\]+     { string.append( yytext() ); }
+   \\t              { string.append('\t'); }
+   \\n              { string.append('\n'); }
+   \\r              { string.append('\r'); }
+   \\\"             { string.append('\"'); }
+   \\               { string.append('\\'); }
+   <<EOF>>          {
+   yybegin(YYINITIAL); // Volvemos a cambiar el estado del lexer de vuelta a YYINITIAL
+   return symbol(sym.error, "Error: Cadena no cerrada en la línea " + yyline + ", columna " + yycolumn);
+   }
+}
+
+// Se maneja el error cuando se obtiene un comentario multilinea sin cerrar
+<COMMENT> {
+    \_\/ { yybegin(YYINITIAL); /* end of multiline comment */ }
+    [^\n\r]+ { /* ignore */ }
+    \n|\r { /* ignore newlines */ }
+    <<EOF>> {
+        yybegin(YYINITIAL); // Volvemos a cambiar el estado del lexer de vuelta a YYINITIAL
+        return symbol(sym.error, "Error: Comentario de múltiples líneas no cerrado en la línea " + yyline + ", columna " + yycolumn);
+    }
 }
 
 /* error fallback */
-[^] { throw new Error("Illegal character <"+ yytext()+">"); }
+[^] { System.out.println("Error: Caracter '" + yytext() + "' no reconocido en la línea " + yyline + ", columna " + yycolumn);}
