@@ -2,6 +2,15 @@ package ParserLexer;
 
 import java_cup.runtime.*;
 
+action code {:
+    public void hola() {
+        System.out.println("hola");
+    }
+    public void adios() {
+        System.out.println("adios");
+    }
+:}
+
 parser code {:
     // Connect this parser to a scanner!
     lexer lex;
@@ -24,7 +33,7 @@ terminal PINO;
 terminal DASHER, DANCER, PRANCER, VIXEN, COMET, RUDOLPH;
 // Operadores Aritméticos Unarios ( ++, -- ):
 terminal GRINCH, QUIEN;
-// Operadores Relacionales ( =, !=, >, <, =<, =< ):
+// Operadores Relacionales ( ==, !=, >, <, =<, =< ):
 terminal ALABASTER, BUSHY, PEPPER, SUGARPLUM, WUNORSE, JINGLE;
 // Operadores Logicos ( ^, #, ! ):
 terminal MELCHOR, GASPAR, BALTAZAR;
@@ -51,14 +60,180 @@ terminal PERSONA;
 // EXTRA:
 terminal LOCAL;
 terminal FUNCTION;
+terminal MAIN;
 
 // No terminales
-nonterminal miLenguaje, program, declList, decl, varDecl, scopedVarDecm, varDeclList, varDeclInit, varDeclId, typeSpec;
+nonterminal navidad; //Inicial
+nonterminal block; // Bloque de código
+nonterminal type, arr_type; //Tipos y tipos de arreglo
+nonterminal func_decl, var_decl, arr_decl; // Declaraciones
+nonterminal param_list, param; // Parámetros
+nonterminal var_decl_init, arr_decl_init; // Variables y arreglos inicializados
+nonterminal stmt, decl_stmt, expr_stmt, assg_stmt, ctrl_struct_stmt, input_output_stmt, return_stmt, break_stmt; // Declaraciones
+nonterminal stmt_list; //Lista de declaraciones
+nonterminal conditional_stmt, iter_stmt; // Estructuras de control
+nonterminal elif_else;
+nonterminal do_until_loop, for_loop;
+nonterminal read_stmt, write_stmt;
+nonterminal expr, expr_list; // Expresiones
+nonterminal and_expr, not_expr, rel_expr, rel_op;
+nonterminal add_sub_expr, add_sub_ops;
+nonterminal mul_div_expr, mul_div_ops;
+nonterminal exp_expr;
+nonterminal un_arith_expr, un_arith_ops;
+nonterminal factor;
+nonterminal mutable, immutable; // Mutable o inmutable
+nonterminal call; // Llamada a función
+nonterminal args, arg_list; // Argumentos
+nonterminal literal; // Literales
 
-/* Precedences */
-precedence left DASHER, DANCER;
-precedence left PRANCER, VIXEN, COMET;
+start with navidad;
 
-start with miLenguaje;
+navidad ::= FUNCTION FATHERCHRISTMAS MAIN ABRECUENTO CIERRACUENTO block {: hola(); :}; //Funciona
 
-miLenguaje ::= {: :};
+block ::= ABREREGALO CIERRAREGALO;
+
+type ::= FATHERCHRISTMAS
+       | KRISKRINGLE
+       | SANTACLAUS
+       | DEDMOROZ
+       | SANNICOLAS;
+
+arr_type ::= FATHERCHRISTMAS
+             SANTACLAUS;
+
+decl_stmt ::= func_decl
+            | var_decl_init FINREGALO
+            | arr_decl_init FINREGALO;
+
+func_decl ::= FUNCTION type PERSONA ABRECUENTO param_list CIERRACUENTO block;
+
+param_list ::= param
+             | param PINO param_list
+             | ;
+
+param ::= type PERSONA
+        | type PERSONA ABREEMPAQUE CIERRAEMPAQUE;
+
+var_decl_init ::= var_decl
+                | var_decl ENTREGA expr;
+
+var_decl ::= LOCAL type PERSONA;
+
+arr_decl_init ::= arr_decl
+                | arr_decl ENTREGA ABREEMPAQUE expr_list CIERRAEMPAQUE;
+
+arr_decl ::= LOCAL arr_type PERSONA ABREEMPAQUE expr CIERRAEMPAQUE;
+
+stmt ::= decl_stmt
+       | expr_stmt
+       | assg_stmt
+       | ctrl_struct_stmt
+       | input_output_stmt
+       | return_stmt
+       | break_stmt;
+
+stmt_list ::= stmt_list stmt
+            | ;
+
+expr_stmt ::= expr FINREGALO
+            | FINREGALO;
+
+expr_list ::= expr
+            | expr PINO expr_list;
+
+assg_stmt ::= mutable ENTREGA expr FINREGALO;
+
+ctrl_struct_stmt ::= conditional_stmt FINREGALO
+                   | iter_stmt FINREGALO;
+
+conditional_stmt ::= ELFO ABRECUENTO expr CIERRACUENTO block elif_else;
+
+elif_else ::= HADA ABRECUENTO expr CIERRACUENTO block elif_else
+            | DUENDE block
+            | ;
+
+iter_stmt ::= do_until_loop
+            | for_loop;
+
+do_until_loop ::= HACE block REVISA ABRECUENTO expr CIERRACUENTO FINREGALO;
+
+for_loop ::= ENVUELVE ABRECUENTO var_decl_init FINREGALO expr FINREGALO expr FINREGALO CIERRACUENTO block
+           | ENVUELVE ABRECUENTO assg_stmt FINREGALO expr FINREGALO expr FINREGALO CIERRACUENTO block;
+
+input_output_stmt ::= read_stmt FINREGALO
+                    | write_stmt FINREGALO;
+
+read_stmt ::= NARRA ABRECUENTO PERSONA CIERRACUENTO;
+
+write_stmt ::= ESCUCHA ABRECUENTO expr CIERRACUENTO;
+
+return_stmt ::= ENVIA expr_stmt;
+
+break_stmt ::= CORTA FINREGALO;
+
+expr ::= expr GASPAR and_expr
+       | and_expr;
+
+and_expr ::= and_expr MELCHOR not_expr
+           | not_expr;
+
+not_expr ::= BALTAZAR not_expr
+           | rel_expr;
+
+rel_expr ::= add_sub_expr rel_op add_sub_expr
+           | add_sub_expr;
+
+rel_op ::= ALABASTER
+         | BUSHY
+         | PEPPER
+         | SUGARPLUM
+         | WUNORSE
+         | JINGLE;
+
+add_sub_expr ::= add_sub_expr add_sub_ops mul_div_expr
+               | mul_div_expr;
+
+add_sub_ops ::= DASHER
+              | DANCER;
+
+mul_div_expr ::= mul_div_expr mul_div_ops exp_expr
+               | exp_expr;
+
+mul_div_ops ::= PRANCER
+              | VIXEN
+              | COMET;
+
+exp_expr ::= exp_expr RUDOLPH un_arith_expr
+           | un_arith_expr;
+
+un_arith_expr ::= un_arith_ops un_arith_expr
+                | factor;
+
+un_arith_ops ::= GRINCH
+               | QUIEN
+               | DANCER;
+
+factor ::= immutable
+         | mutable;
+
+mutable ::= PERSONA
+          | PERSONA ABREEMPAQUE expr CIERRAEMPAQUE;
+
+immutable ::= ABRECUENTO expr CIERRACUENTO
+            | call
+            | literal;
+
+call ::= PERSONA ABRECUENTO args CIERRACUENTO;
+
+args ::= arg_list
+       | ;
+
+arg_list ::= arg_list PINO expr
+           | expr;
+
+literal ::= L_SANTACLAUS
+          | L_FATHERCHRISTMAS
+          | L_KRISKRINGLE
+          | L_SANNICOLAS
+          | L_DEDMOROZ;

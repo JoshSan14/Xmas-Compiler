@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import ParserLexer.parser;
 import java_cup.runtime.Symbol;
 import jflex.exceptions.SilentExit;
 
@@ -56,6 +57,13 @@ public class MainJFlexCup {
                 return;
             }
         }
+    }
+
+    public void ParserTest1(String parseRoute) throws Exception {
+        Reader inputLexer = new FileReader(parseRoute);
+        lexer myLexer = new lexer(inputLexer);
+        parser myParser = new parser(myLexer);
+        myParser.parse();
     }
 
 

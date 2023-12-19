@@ -95,41 +95,44 @@ l_string = \"
     // Local
     "local" {return symbol(sym.LOCAL);}
     // Funcion
-    "funcion" {return symbol(sym.FUNCTION);}
-    // Manejo de errores
-    // Identificador invalido
-    {secuenciaInvalida}  {
-            return symbol(sym.error, "Error: Secuencia de caracteres '" + yytext() + "' no permitida en la línea " + yyline + ", columna " + yycolumn);}
-    // Numero pegado a letras
-    {EnteroConLetras}  {
-          return symbol(sym.error, "Error: Entero no permitido '" + yytext() + "' en la línea " + yyline + ", columna " + yycolumn);
-    }
+    "function" {return symbol(sym.FUNCTION);}
+    // main
+    "main" {return symbol(sym.MAIN);}
+    // Caracteres
+        // Lexema Separador
+        "," {return symbol(sym.PINO);}
+        // Operadores Aritméticos Binarios
+        "+" {return symbol(sym.DASHER);}
+        "-" {return symbol(sym.DANCER);}
+        "*" {return symbol(sym.PRANCER);}
+        "/" {return symbol(sym.VIXEN);}
+        "~" {return symbol(sym.COMET);}
+        "**" {return symbol(sym.RUDOLPH);}
+        // Operadores Aritméticos Unarios
+        "++" {return symbol(sym.GRINCH);}
+        "--" {return symbol(sym.QUIEN);}
+        // Operadores Relacionales
+        "==" {return symbol(sym.ALABASTER);}
+        "!=" {return symbol(sym.BUSHY);}
+        ">" {return symbol(sym.PEPPER);}
+        "<" {return symbol(sym.SUGARPLUM);}
+        "=>" {return symbol(sym.WUNORSE);}
+        "=<" {return symbol(sym.JINGLE);}
+        // Operadores Lógicos
+        "^" {return symbol(sym.MELCHOR);}
+        "#" {return symbol(sym.GASPAR);}
+        "!" {return symbol(sym.BALTAZAR);}
     // Identificador
     {identifier} {return symbol(sym.PERSONA);}
-    // Caracteres
-    // Lexema Separador
-    "," {return symbol(sym.PINO);}
-    // Operadores Aritméticos Binarios
-    "+" {return symbol(sym.DASHER);}
-    "-" {return symbol(sym.DANCER);}
-    "*" {return symbol(sym.PRANCER);}
-    "/" {return symbol(sym.VIXEN);}
-    "~" {return symbol(sym.COMET);}
-    "**" {return symbol(sym.RUDOLPH);}
-    // Operadores Aritméticos Unarios
-    "++" {return symbol(sym.GRINCH);}
-    "--" {return symbol(sym.QUIEN);}
-    // Operadores Relacionales
-    "==" {return symbol(sym.ALABASTER);}
-    "!=" {return symbol(sym.BUSHY);}
-    ">" {return symbol(sym.PEPPER);}
-    "<" {return symbol(sym.SUGARPLUM);}
-    "=>" {return symbol(sym.WUNORSE);}
-    "=<" {return symbol(sym.JINGLE);}
-    // Operadores Lógicos
-    "^" {return symbol(sym.MELCHOR);}
-    "#" {return symbol(sym.GASPAR);}
-    "!" {return symbol(sym.BALTAZAR);}
+    // Manejo de errores
+      // Identificador invalido XXX
+      {secuenciaInvalida}  {
+              return symbol(sym.error, "Error: Secuencia de caracteres '" + yytext() + "' no permitida en la línea " + yyline + ", columna " + yycolumn + "XXX");}
+      // Numero pegado a letras
+      {EnteroConLetras}  {
+            return symbol(sym.error, "Error: Entero no permitido '" + yytext() + "' en la línea " + yyline + ", columna " + yycolumn);
+      }
+
 }
 
 // Se maneja el error cuando se obtiene un string sin cerrar

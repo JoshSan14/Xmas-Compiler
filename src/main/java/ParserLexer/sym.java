@@ -26,6 +26,7 @@ public class sym {
   public static final int ABREEMPAQUE = 32;
   public static final int CIERRAEMPAQUE = 33;
   public static final int NARRA = 44;
+  public static final int MAIN = 51;
   public static final int HACE = 40;
   public static final int ENVUELVE = 39;
   public static final int GRINCH = 9;
@@ -110,7 +111,8 @@ public class sym {
   "ENTREGA",
   "PERSONA",
   "LOCAL",
-  "FUNCTION"
+  "FUNCTION",
+  "MAIN"
   };
 }
 

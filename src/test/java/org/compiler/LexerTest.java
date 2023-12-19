@@ -1,5 +1,7 @@
 package org.compiler;
 
+import ParserLexer.lexer;
+import ParserLexer.sym;
 import java_cup.runtime.Symbol;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

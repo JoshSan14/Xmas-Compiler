@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-
 public class App
 {
     public static void GenerarLexerParser() throws Exception{
@@ -37,6 +36,7 @@ public class App
     public static void main( String[] args ) throws Exception {
         GenerarLexerParser();
         MainJFlexCup mfjc = new MainJFlexCup();
-        mfjc.LexerTest(System.getProperty("user.dir")+"\\src\\main\\java\\ParserLexer\\prueba.txt");
+        //mfjc.LexerTest(System.getProperty("user.dir")+"\\src\\main\\java\\ParserLexer\\testlexer.txt");
+        mfjc.ParserTest1(System.getProperty("user.dir")+"\\src\\main\\java\\ParserLexer\\pruebaparser.txt");
     }
 }
