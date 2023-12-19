@@ -89,9 +89,9 @@ nonterminal literal; // Literales
 
 start with navidad;
 
-navidad ::= FUNCTION FATHERCHRISTMAS MAIN ABRECUENTO CIERRACUENTO block {: hola(); :}; //Funciona
+navidad ::= FUNCTION FATHERCHRISTMAS MAIN ABRECUENTO CIERRACUENTO block {: System.out.println("NAVIDAD");; :}; //Funciona
 
-block ::= ABREREGALO CIERRAREGALO;
+block ::= ABREREGALO stmt_list CIERRAREGALO {: System.out.println("BLOCK"); :};
 
 type ::= FATHERCHRISTMAS
        | KRISKRINGLE
@@ -116,9 +116,9 @@ param ::= type PERSONA
         | type PERSONA ABREEMPAQUE CIERRAEMPAQUE;
 
 var_decl_init ::= var_decl
-                | var_decl ENTREGA expr;
+                | var_decl ENTREGA expr {: System.out.println("VARIABLE DECLARATION INIT");:};
 
-var_decl ::= LOCAL type PERSONA;
+var_decl ::= LOCAL type PERSONA {: System.out.println("VARIABLE DECLARATION");:};
 
 arr_decl_init ::= arr_decl
                 | arr_decl ENTREGA ABREEMPAQUE expr_list CIERRAEMPAQUE;

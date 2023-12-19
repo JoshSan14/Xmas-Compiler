@@ -1,1 +1,1 @@
- function int main() { }
+ function int main() { local int i <= 4| }
