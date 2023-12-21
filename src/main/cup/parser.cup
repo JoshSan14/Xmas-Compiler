@@ -66,10 +66,10 @@ terminal MAIN;
 nonterminal navidad; //Inicial
 nonterminal block; // Bloque de código
 nonterminal type, arr_type; //Tipos y tipos de arreglo
-nonterminal func_decl, var_decl, arr_decl; // Declaraciones
+nonterminal func_decl, func_decl_list, var_decl, arr_decl; // Declaraciones
 nonterminal param_list, param; // Parámetros
 nonterminal var_decl_init, arr_decl_init; // Variables y arreglos inicializados
-nonterminal stmt, decl_stmt, expr_stmt, assg_stmt, ctrl_struct_stmt, input_output_stmt, return_stmt, break_stmt; // Declaraciones
+nonterminal stmt, init_stmt, expr_stmt, assg_stmt, ctrl_struct_stmt, input_output_stmt, return_stmt, break_stmt; // Declaraciones
 nonterminal stmt_list; //Lista de declaraciones
 nonterminal conditional_stmt, iter_stmt; // Estructuras de control
 nonterminal elif_else;
@@ -86,46 +86,59 @@ nonterminal mutable, immutable; // Mutable o inmutable
 nonterminal call; // Llamada a función
 nonterminal args, arg_list; // Argumentos
 nonterminal literal; // Literales
-
+nonterminal var_id, arr_id, identifier, var_init, arr_init;
 start with navidad;
 
-navidad ::= FUNCTION FATHERCHRISTMAS MAIN ABRECUENTO CIERRACUENTO block {: System.out.println("NAVIDAD");; :}; //Funciona
+/**********************************************************************************************************************/
 
-block ::= ABREREGALO stmt_list CIERRAREGALO {: System.out.println("BLOCK"); :};
+navidad ::= func_decl_list {: System.out.println("ENTRY"); :};
 
-type ::= FATHERCHRISTMAS
-       | KRISKRINGLE
-       | SANTACLAUS
-       | DEDMOROZ
-       | SANNICOLAS;
 
-arr_type ::= FATHERCHRISTMAS
-             SANTACLAUS;
+func_decl_list ::= func_decl
+                 | func_decl func_decl_list {: //System.out.println("FUNCTION LIST") ;:};
 
-decl_stmt ::= func_decl
-            | var_decl_init FINREGALO
-            | arr_decl_init FINREGALO;
+func_decl ::= FUNCTION identifier ABRECUENTO param_list CIERRACUENTO block {: System.out.println("FUNCTION"); :};
 
-func_decl ::= FUNCTION type PERSONA ABRECUENTO param_list CIERRACUENTO block;
+identifier ::= var_id | arr_id;
 
-param_list ::= param
-             | param PINO param_list
+type ::= FATHERCHRISTMAS{: //System.out.println("INT"); :}
+       | KRISKRINGLE {: //System.out.println("FLOAT"); :}
+       | SANTACLAUS {: //System.out.println("CHAR"); :}
+       | DEDMOROZ {: //System.out.println("STRING"); :}
+       | SANNICOLAS {: //System.out.println("BOOL"); :};
+
+var_id ::= type PERSONA {: System.out.println("VAR_ID"); :};
+
+arr_id ::= type PERSONA ABREEMPAQUE CIERRAEMPAQUE {:System.out.println("ARR_ID");:}
+         | type PERSONA ABREEMPAQUE expr CIERRAEMPAQUE {:System.out.println("ARR_ID");:};
+
+param_list ::= identifier
+             | identifier PINO param_list
              | ;
 
-param ::= type PERSONA
-        | type PERSONA ABREEMPAQUE CIERRAEMPAQUE;
+block ::= ABREREGALO stmt_list CIERRAREGALO;
 
-var_decl_init ::= var_decl
-                | var_decl ENTREGA expr {: System.out.println("VARIABLE DECLARATION INIT");:};
+init_stmt ::= var_decl_init FINREGALO
+            | arr_decl_init FINREGALO;
 
-var_decl ::= LOCAL type PERSONA {: System.out.println("VARIABLE DECLARATION");:};
+var_decl_init ::= var_init | var_decl;
 
-arr_decl_init ::= arr_decl
-                | arr_decl ENTREGA ABREEMPAQUE expr_list CIERRAEMPAQUE;
+var_init ::= var_decl ENTREGA expr {: System.out.println("VAR_INIT"); :};
 
-arr_decl ::= LOCAL arr_type PERSONA ABREEMPAQUE expr CIERRAEMPAQUE;
+var_decl ::= LOCAL var_id {: System.out.println("VAR_DECL"); :};
 
-stmt ::= decl_stmt
+arr_decl_init ::= arr_init | arr_decl;
+
+arr_init ::= arr_decl ENTREGA ABREEMPAQUE expr_list CIERRAEMPAQUE {: System.out.println("ARR_INIT"); :};
+
+arr_decl ::= LOCAL arr_id {: System.out.println("ARR_DECL"); :};
+
+expr_list ::= expr
+            | expr PINO expr_list;
+
+/**********************************************************************************************************************/
+
+stmt ::= init_stmt
        | expr_stmt
        | assg_stmt
        | ctrl_struct_stmt
@@ -133,19 +146,18 @@ stmt ::= decl_stmt
        | return_stmt
        | break_stmt;
 
-stmt_list ::= stmt_list stmt
+stmt_list ::= stmt stmt_list
             | ;
 
 expr_stmt ::= expr FINREGALO
             | FINREGALO;
 
-expr_list ::= expr
-            | expr PINO expr_list;
 
 assg_stmt ::= mutable ENTREGA expr FINREGALO;
 
-ctrl_struct_stmt ::= conditional_stmt FINREGALO
-                   | iter_stmt FINREGALO;
+
+ctrl_struct_stmt ::= conditional_stmt
+                   | iter_stmt;
 
 conditional_stmt ::= ELFO ABRECUENTO expr CIERRACUENTO block elif_else;
 
@@ -158,8 +170,8 @@ iter_stmt ::= do_until_loop
 
 do_until_loop ::= HACE block REVISA ABRECUENTO expr CIERRACUENTO FINREGALO;
 
-for_loop ::= ENVUELVE ABRECUENTO var_decl_init FINREGALO expr FINREGALO expr FINREGALO CIERRACUENTO block
-           | ENVUELVE ABRECUENTO assg_stmt FINREGALO expr FINREGALO expr FINREGALO CIERRACUENTO block;
+for_loop ::= ENVUELVE ABRECUENTO var_init FINREGALO expr FINREGALO expr CIERRACUENTO block
+           | ENVUELVE ABRECUENTO assg_stmt expr FINREGALO expr CIERRACUENTO block;
 
 input_output_stmt ::= read_stmt FINREGALO
                     | write_stmt FINREGALO;
@@ -172,16 +184,18 @@ return_stmt ::= ENVIA expr_stmt;
 
 break_stmt ::= CORTA FINREGALO;
 
-expr ::= expr GASPAR and_expr
+expr ::= and_expr GASPAR expr
        | and_expr;
 
-and_expr ::= and_expr MELCHOR not_expr
+
+and_expr ::= not_expr MELCHOR and_expr
            | not_expr;
 
-not_expr ::= BALTAZAR not_expr
+
+not_expr ::= BALTAZAR rel_expr
            | rel_expr;
 
-rel_expr ::= add_sub_expr rel_op add_sub_expr
+rel_expr ::= add_sub_expr rel_op rel_expr
            | add_sub_expr;
 
 rel_op ::= ALABASTER
@@ -191,21 +205,24 @@ rel_op ::= ALABASTER
          | WUNORSE
          | JINGLE;
 
-add_sub_expr ::= add_sub_expr add_sub_ops mul_div_expr
+
+add_sub_expr ::= mul_div_expr add_sub_ops add_sub_expr
                | mul_div_expr;
 
 add_sub_ops ::= DASHER
               | DANCER;
 
-mul_div_expr ::= mul_div_expr mul_div_ops exp_expr
+
+mul_div_expr ::= exp_expr mul_div_ops mul_div_expr
                | exp_expr;
 
 mul_div_ops ::= PRANCER
               | VIXEN
               | COMET;
 
-exp_expr ::= exp_expr RUDOLPH un_arith_expr
+exp_expr ::= un_arith_expr RUDOLPH exp_expr
            | un_arith_expr;
+
 
 un_arith_expr ::= un_arith_ops un_arith_expr
                 | factor;
@@ -224,12 +241,12 @@ immutable ::= ABRECUENTO expr CIERRACUENTO
             | call
             | literal;
 
-call ::= PERSONA ABRECUENTO args CIERRACUENTO;
+call ::= PERSONA ABRECUENTO args CIERRACUENTO {:System.out.println("CALL");:};
 
 args ::= arg_list
        | ;
 
-arg_list ::= arg_list PINO expr
+arg_list ::= expr PINO arg_list
            | expr;
 
 literal ::= L_SANTACLAUS

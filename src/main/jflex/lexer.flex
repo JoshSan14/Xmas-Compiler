@@ -126,12 +126,12 @@ l_string = \"
     {identifier} {return symbol(sym.PERSONA);}
     // Manejo de errores
       // Identificador invalido XXX
-      {secuenciaInvalida}  {
-              return symbol(sym.error, "Error: Secuencia de caracteres '" + yytext() + "' no permitida en la línea " + yyline + ", columna " + yycolumn + "XXX");}
+//      {secuenciaInvalida}  {
+//              return symbol(sym.error, "Error: Secuencia de caracteres '" + yytext() + "' no permitida en la línea " + yyline + ", columna " + yycolumn + "XXX");}
       // Numero pegado a letras
-      {EnteroConLetras}  {
-            return symbol(sym.error, "Error: Entero no permitido '" + yytext() + "' en la línea " + yyline + ", columna " + yycolumn);
-      }
+//      {EnteroConLetras}  {
+//            return symbol(sym.error, "Error: Entero no permitido '" + yytext() + "' en la línea " + yyline + ", columna " + yycolumn);
+//      }
 
 }
 

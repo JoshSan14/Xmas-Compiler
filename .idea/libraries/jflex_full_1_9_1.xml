@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="jflex-full-1.9.1">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../../../../Java Libs/jflex-1.9.1/lib/jflex-full-1.9.1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
