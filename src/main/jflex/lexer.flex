@@ -59,16 +59,16 @@ l_string = \"
     // Espacio en blanco
     {WhiteSpace} { /* ignore */ }
     // Tipos de Datos
-    "char" {return symbol(sym.SANTACLAUS);}
-    "int" {return symbol(sym.FATHERCHRISTMAS);}
-    "float" {return symbol(sym.KRISKRINGLE);}
-    "bool" {return symbol(sym.SANNICOLAS);}
-    "string" {return symbol(sym.DEDMOROZ);}
+    "char" {return symbol(sym.SANTACLAUS, yytext());}
+    "int" {return symbol(sym.FATHERCHRISTMAS, yytext());}
+    "float" {return symbol(sym.KRISKRINGLE, yytext());}
+    "bool" {return symbol(sym.SANNICOLAS, yytext());}
+    "string" {return symbol(sym.DEDMOROZ, yytext());}
     // Literales
-    {l_char} {return symbol(sym.L_SANTACLAUS);}
-    {l_int} {return symbol(sym.L_FATHERCHRISTMAS);}
-    {l_float} {return symbol(sym.L_KRISKRINGLE);}
-    {l_boolean} {return symbol(sym.L_SANNICOLAS);}
+    {l_char} {return symbol(sym.L_SANTACLAUS, yytext());}
+    {l_int} {return symbol(sym.L_FATHERCHRISTMAS, yytext());}
+    {l_float} {return symbol(sym.L_KRISKRINGLE, yytext());}
+    {l_boolean} {return symbol(sym.L_SANNICOLAS, yytext());}
     {l_string} {string.setLength(0); yybegin(STRING);}
     "(" {return symbol(sym.ABRECUENTO);}
     ")" {return symbol(sym.CIERRACUENTO);}
@@ -96,8 +96,6 @@ l_string = \"
     "local" {return symbol(sym.LOCAL);}
     // Funcion
     "function" {return symbol(sym.FUNCTION);}
-    // main
-    "main" {return symbol(sym.MAIN);}
     // Caracteres
         // Lexema Separador
         "," {return symbol(sym.PINO);}
@@ -123,7 +121,7 @@ l_string = \"
         "#" {return symbol(sym.GASPAR);}
         "!" {return symbol(sym.BALTAZAR);}
     // Identificador
-    {identifier} {return symbol(sym.PERSONA);}
+    {identifier} {return symbol(sym.PERSONA, yytext());}
     // Manejo de errores
       // Identificador invalido XXX
 //      {secuenciaInvalida}  {

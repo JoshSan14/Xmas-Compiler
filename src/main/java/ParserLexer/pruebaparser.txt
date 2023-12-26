@@ -1,4 +1,8 @@
-function int func_a(int i[alfa(a, b, 1)]) {
+function int main() {
+    local int ab|
+}
+
+function int func_a(int b[alfa(a, b, 1)], bool y, float x) {
    local int i <= alfa() |
    local char o|
    local bool bip <= alfa(a, b, c[0])|
@@ -35,7 +39,6 @@ function int func_a(int i[alfa(a, b, 1)]) {
     for (i <= 0 | ++i | i =< 10) {
         i <= i + 1|
     }
-
 
 }
 

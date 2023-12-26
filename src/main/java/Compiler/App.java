@@ -36,7 +36,7 @@ public class App
     public static void main( String[] args ) throws Exception {
         GenerarLexerParser();
         MainJFlexCup mfjc = new MainJFlexCup();
-        //mfjc.LexerTest(System.getProperty("user.dir")+"\\src\\main\\java\\ParserLexer\\testlexer.txt");
+        mfjc.LexerTest(System.getProperty("user.dir")+"\\src\\main\\java\\ParserLexer\\pruebaparser.txt");
         mfjc.ParserTest1(System.getProperty("user.dir")+"\\src\\main\\java\\ParserLexer\\pruebaparser.txt");
     }
 }

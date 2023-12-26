@@ -1,6 +1,11 @@
 package ParserLexer;
-
 import java_cup.runtime.*;
+import SymbolTable.*;
+import Utils.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 action code {:
     public void hola() {
@@ -9,6 +14,9 @@ action code {:
     public void adios() {
         System.out.println("adios");
     }
+
+    private SymbolTableManager symTabMgr = new SymbolTableManager();
+    private Map<String, TabSymbol> symbols = new HashMap<String, TabSymbol>();
 :}
 
 parser code {:
@@ -38,12 +46,12 @@ terminal ALABASTER, BUSHY, PEPPER, SUGARPLUM, WUNORSE, JINGLE;
 // Operadores Logicos ( ^, #, ! ):
 terminal MELCHOR, GASPAR, BALTAZAR;
 // Tipos de Datos ( char, int, float, boolean, string ):
-terminal SANTACLAUS, FATHERCHRISTMAS, KRISKRINGLE, SANNICOLAS, DEDMOROZ;
+terminal String SANTACLAUS, FATHERCHRISTMAS, KRISKRINGLE, SANNICOLAS, DEDMOROZ;
 // Literales
-terminal char L_SANTACLAUS; // Nuestro scanner provee l_SANTACLAUS como char
-terminal int L_FATHERCHRISTMAS; // Nuestro scanner provee l_SANTACLAUS como int
-terminal float L_KRISKRINGLE; // Nuestro scanner provee l_SANTACLAUS como float
-terminal boolean L_SANNICOLAS; // Nuestro scanner provee l_SANTACLAUS como boolean
+terminal String L_SANTACLAUS; // Nuestro scanner provee l_SANTACLAUS como char
+terminal String L_FATHERCHRISTMAS; // Nuestro scanner provee l_SANTACLAUS como int
+terminal String L_KRISKRINGLE; // Nuestro scanner provee l_SANTACLAUS como float
+terminal String L_SANNICOLAS; // Nuestro scanner provee l_SANTACLAUS como boolean
 terminal String L_DEDMOROZ; // Nuestro scanner provee l_SANTACLAUS como String
 // Parentesis ( (, ), [, ], {, } ):
 terminal ABRECUENTO, CIERRACUENTO, ABREEMPAQUE, CIERRAEMPAQUE, ABREREGALO, CIERRAREGALO;
@@ -56,11 +64,10 @@ terminal FINREGALO;
 // Lexema de Asignación ( <= ):
 terminal ENTREGA;
 // Identificador ( variable, función ):
-terminal PERSONA;
+terminal String PERSONA;
 // EXTRA:
 terminal LOCAL;
 terminal FUNCTION;
-terminal MAIN;
 
 // No terminales
 nonterminal navidad; //Inicial
@@ -86,55 +93,67 @@ nonterminal mutable, immutable; // Mutable o inmutable
 nonterminal call; // Llamada a función
 nonterminal args, arg_list; // Argumentos
 nonterminal literal; // Literales
-nonterminal var_id, arr_id, identifier, var_init, arr_init;
+nonterminal gen_id, arr_id, identifier, var_init, arr_init;
 start with navidad;
 
 /**********************************************************************************************************************/
 
-navidad ::= func_decl_list {: System.out.println("ENTRY"); :};
-
+navidad ::= func_decl_list {: System.out.println("ENTRY");
+                            symTabMgr.printAllTables();
+                            :};
 
 func_decl_list ::= func_decl
                  | func_decl func_decl_list {: //System.out.println("FUNCTION LIST") ;:};
 
-func_decl ::= FUNCTION identifier ABRECUENTO param_list CIERRACUENTO block {: System.out.println("FUNCTION"); :};
+func_decl ::= FUNCTION identifier:id ABRECUENTO param_list CIERRACUENTO block {:
+    RESULT = "function::" + id; System.out.println(RESULT);
+    Utils.splitAddFunc((String)RESULT, symbols, symTabMgr);
+    :};
 
-identifier ::= var_id | arr_id;
+identifier ::= gen_id:id {: RESULT = id; :}
+             | arr_id:id {: RESULT = id; :};
 
-type ::= FATHERCHRISTMAS{: //System.out.println("INT"); :}
-       | KRISKRINGLE {: //System.out.println("FLOAT"); :}
-       | SANTACLAUS {: //System.out.println("CHAR"); :}
-       | DEDMOROZ {: //System.out.println("STRING"); :}
-       | SANNICOLAS {: //System.out.println("BOOL"); :};
+type ::= FATHERCHRISTMAS: t_int {: RESULT = t_int; :}
+       | KRISKRINGLE: t_flt {: RESULT = t_flt; :}
+       | SANTACLAUS: t_char {: RESULT = t_char; :}
+       | DEDMOROZ: t_str {: RESULT = t_str; :}
+       | SANNICOLAS: t_bool {: RESULT = t_bool; :};
 
-var_id ::= type PERSONA {: System.out.println("VAR_ID"); :};
+gen_id ::= type:tp PERSONA:id {: RESULT = tp + "::" + id; :};
 
-arr_id ::= type PERSONA ABREEMPAQUE CIERRAEMPAQUE {:System.out.println("ARR_ID");:}
-         | type PERSONA ABREEMPAQUE expr CIERRAEMPAQUE {:System.out.println("ARR_ID");:};
+arr_id ::= gen_id:id ABREEMPAQUE CIERRAEMPAQUE {: RESULT = id + "::undefined" ; :}
+         | gen_id:id ABREEMPAQUE expr:size CIERRAEMPAQUE {: RESULT = id + "::" + (String)size; :};
 
-param_list ::= identifier
-             | identifier PINO param_list
+param_list ::= param
+             | param PINO param_list
              | ;
+
+param ::= identifier:id {: RESULT = "parameter::" + (String)id;
+                           Utils.splitAddSym((String)RESULT, symbols); :};
 
 block ::= ABREREGALO stmt_list CIERRAREGALO;
 
-init_stmt ::= var_decl_init FINREGALO
-            | arr_decl_init FINREGALO;
+init_stmt ::= var_decl_init:var FINREGALO {: RESULT = "variable::" + (String)var;
+                                             Utils.splitAddSym((String)RESULT, symbols); :}
+            | arr_decl_init:arr FINREGALO {: RESULT = "array::" + (String)arr;
+                                             Utils.splitAddSym((String)RESULT, symbols); :};
 
-var_decl_init ::= var_init | var_decl;
+var_decl_init ::= var_init:var {: RESULT = (String)var; :}
+                | var_decl:var {: RESULT = (String)var; :};
 
-var_init ::= var_decl ENTREGA expr {: System.out.println("VAR_INIT"); :};
+var_init ::= var_decl:var ENTREGA expr:expr {: RESULT = var; :};
 
-var_decl ::= LOCAL var_id {: System.out.println("VAR_DECL"); :};
+var_decl ::= LOCAL gen_id:id {: RESULT = id; :};
 
-arr_decl_init ::= arr_init | arr_decl;
+arr_decl_init ::= arr_init:arr {: RESULT = (String)arr; :}
+                | arr_decl:arr {: RESULT = (String)arr; :};
 
-arr_init ::= arr_decl ENTREGA ABREEMPAQUE expr_list CIERRAEMPAQUE {: System.out.println("ARR_INIT"); :};
+arr_init ::= arr_decl:id ENTREGA ABREEMPAQUE expr_list:expr_l CIERRAEMPAQUE {: RESULT = id; :};
 
-arr_decl ::= LOCAL arr_id {: System.out.println("ARR_DECL"); :};
+arr_decl ::= LOCAL arr_id:id {: RESULT = id; :};
 
-expr_list ::= expr
-            | expr PINO expr_list;
+expr_list ::= expr:expr {: RESULT = (String) expr; :}
+            | expr:expr PINO expr_list:expr_l {: RESULT = (String)expr + ", " + (String)expr_l; :};
 
 /**********************************************************************************************************************/
 
@@ -231,26 +250,26 @@ un_arith_ops ::= GRINCH
                | QUIEN
                | DANCER;
 
-factor ::= immutable
-         | mutable;
+factor ::= immutable:immut {: RESULT = immut; :}
+         | mutable:mut {: RESULT = mut; :};
 
-mutable ::= PERSONA
-          | PERSONA ABREEMPAQUE expr CIERRAEMPAQUE;
+mutable ::= PERSONA:id {: RESULT = id; :}
+          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = id + "[" + expr + "]" ; :};
 
-immutable ::= ABRECUENTO expr CIERRACUENTO
-            | call
-            | literal;
+immutable ::= ABRECUENTO expr:expr CIERRACUENTO {: RESULT = "(" + expr + ")"; :}
+            | call:call {: RESULT = call; :}
+            | literal:l {: RESULT = l; :};
 
-call ::= PERSONA ABRECUENTO args CIERRACUENTO {:System.out.println("CALL");:};
+call ::= PERSONA:id ABRECUENTO args:args CIERRACUENTO {: RESULT = id + "(" + args + ")"; :};
 
-args ::= arg_list
+args ::= arg_list:arg_l {: RESULT = arg_l; :}
        | ;
 
-arg_list ::= expr PINO arg_list
-           | expr;
+arg_list ::= expr:expr PINO arg_list:arg_l {: RESULT = (String)expr + ", " + (String)arg_l; :}
+           | expr:expr {: RESULT = (String)expr;:};
 
-literal ::= L_SANTACLAUS
-          | L_FATHERCHRISTMAS
-          | L_KRISKRINGLE
-          | L_SANNICOLAS
-          | L_DEDMOROZ;
+literal ::= L_SANTACLAUS: l_char {: RESULT = l_char; :}
+          | L_FATHERCHRISTMAS: l_int {: RESULT = l_int; :}
+          | L_KRISKRINGLE: l_flt {: RESULT = l_flt; :}
+          | L_SANNICOLAS: l_bool {: RESULT = l_bool; :}
+          | L_DEDMOROZ: l_str {: RESULT = l_str; :};
