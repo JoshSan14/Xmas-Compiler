@@ -28,7 +28,8 @@ function int func_a(int b[alfa(a, b, 1)], bool y, float x) {
    }
 
    read(a)|
-   write(a => 3)|
+   print(a+b)|
+   local string var_str <= "Hello"|
 
    return a|
 
@@ -39,6 +40,8 @@ function int func_a(int b[alfa(a, b, 1)], bool y, float x) {
     for (i <= 0 | ++i | i =< 10) {
         i <= i + 1|
     }
+
+    local int xyz <= (x + y + z) ** (alfa(a, b, c) - -5 / ++y)|
 
 }
 

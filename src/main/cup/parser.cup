@@ -46,13 +46,13 @@ terminal ALABASTER, BUSHY, PEPPER, SUGARPLUM, WUNORSE, JINGLE;
 // Operadores Logicos ( ^, #, ! ):
 terminal MELCHOR, GASPAR, BALTAZAR;
 // Tipos de Datos ( char, int, float, boolean, string ):
-terminal String SANTACLAUS, FATHERCHRISTMAS, KRISKRINGLE, SANNICOLAS, DEDMOROZ;
+terminal SANTACLAUS, FATHERCHRISTMAS, KRISKRINGLE, SANNICOLAS, DEDMOROZ;
 // Literales
-terminal String L_SANTACLAUS; // Nuestro scanner provee l_SANTACLAUS como char
-terminal String L_FATHERCHRISTMAS; // Nuestro scanner provee l_SANTACLAUS como int
-terminal String L_KRISKRINGLE; // Nuestro scanner provee l_SANTACLAUS como float
-terminal String L_SANNICOLAS; // Nuestro scanner provee l_SANTACLAUS como boolean
-terminal String L_DEDMOROZ; // Nuestro scanner provee l_SANTACLAUS como String
+terminal L_SANTACLAUS; // Nuestro scanner provee l_SANTACLAUS como char
+terminal L_FATHERCHRISTMAS; // Nuestro scanner provee l_SANTACLAUS como int
+terminal L_KRISKRINGLE; // Nuestro scanner provee l_SANTACLAUS como float
+terminal L_SANNICOLAS; // Nuestro scanner provee l_SANTACLAUS como boolean
+terminal L_DEDMOROZ; // Nuestro scanner provee l_SANTACLAUS como String
 // Parentesis ( (, ), [, ], {, } ):
 terminal ABRECUENTO, CIERRACUENTO, ABREEMPAQUE, CIERRAEMPAQUE, ABREREGALO, CIERRAREGALO;
 // Lexemas de Estructuras de Control ( if, elif, else, for, do, until, return, break ):
@@ -64,7 +64,7 @@ terminal FINREGALO;
 // Lexema de Asignación ( <= ):
 terminal ENTREGA;
 // Identificador ( variable, función ):
-terminal String PERSONA;
+terminal PERSONA;
 // EXTRA:
 terminal LOCAL;
 terminal FUNCTION;
@@ -106,27 +106,26 @@ func_decl_list ::= func_decl
                  | func_decl func_decl_list {: //System.out.println("FUNCTION LIST") ;:};
 
 func_decl ::= FUNCTION identifier:id ABRECUENTO param_list CIERRACUENTO block {:
-    RESULT = "function::" + id; System.out.println(RESULT);
-    Utils.splitAddFunc((String)RESULT, symbols, symTabMgr);
-    :};
+                         RESULT = "function::" + (String)id;
+                         Utils.splitAddFunc((String)RESULT, symbols, symTabMgr); :};
 
-identifier ::= gen_id:id {: RESULT = id; :}
-             | arr_id:id {: RESULT = id; :};
+identifier ::= gen_id:id {: RESULT = (String)id; :}
+             | arr_id:id {: RESULT = (String)id; :};
 
-type ::= FATHERCHRISTMAS: t_int {: RESULT = t_int; :}
-       | KRISKRINGLE: t_flt {: RESULT = t_flt; :}
-       | SANTACLAUS: t_char {: RESULT = t_char; :}
-       | DEDMOROZ: t_str {: RESULT = t_str; :}
-       | SANNICOLAS: t_bool {: RESULT = t_bool; :};
+type ::= FATHERCHRISTMAS: t_int {: RESULT = (String)t_int; :}
+       | KRISKRINGLE: t_flt {: RESULT = (String)t_flt; :}
+       | SANTACLAUS: t_char {: RESULT = (String)t_char; :}
+       | DEDMOROZ: t_str {: RESULT = (String)t_str; :}
+       | SANNICOLAS: t_bool {: RESULT = (String)t_bool; :};
 
-gen_id ::= type:tp PERSONA:id {: RESULT = tp + "::" + id; :};
+gen_id ::= type:tp PERSONA:id {: RESULT = (String)tp + "::" + (String)id; :};
 
-arr_id ::= gen_id:id ABREEMPAQUE CIERRAEMPAQUE {: RESULT = id + "::undefined" ; :}
-         | gen_id:id ABREEMPAQUE expr:size CIERRAEMPAQUE {: RESULT = id + "::" + (String)size; :};
+arr_id ::= gen_id:id ABREEMPAQUE CIERRAEMPAQUE {: RESULT = (String)id + "::UNDEFINED" ; :}
+         | gen_id:id ABREEMPAQUE expr:size CIERRAEMPAQUE {: RESULT = (String)id + "::" + (String)size; :};
 
-param_list ::= param
-             | param PINO param_list
-             | ;
+param_list ::= param:par {: RESULT = (String)par; :}
+             | param:par PINO param_list:par_l {: RESULT = (String)par + ", " + (String)par_l; :}
+             | {: RESULT = ""; :};
 
 param ::= identifier:id {: RESULT = "parameter::" + (String)id;
                            Utils.splitAddSym((String)RESULT, symbols); :};
@@ -141,18 +140,18 @@ init_stmt ::= var_decl_init:var FINREGALO {: RESULT = "variable::" + (String)var
 var_decl_init ::= var_init:var {: RESULT = (String)var; :}
                 | var_decl:var {: RESULT = (String)var; :};
 
-var_init ::= var_decl:var ENTREGA expr:expr {: RESULT = var; :};
+var_init ::= var_decl:var ENTREGA expr:expr {: RESULT = (String)var + "::" + (String)expr; :};
 
-var_decl ::= LOCAL gen_id:id {: RESULT = id; :};
+var_decl ::= LOCAL gen_id:id {: RESULT = (String)id; :};
 
 arr_decl_init ::= arr_init:arr {: RESULT = (String)arr; :}
                 | arr_decl:arr {: RESULT = (String)arr; :};
 
-arr_init ::= arr_decl:id ENTREGA ABREEMPAQUE expr_list:expr_l CIERRAEMPAQUE {: RESULT = id; :};
+arr_init ::= arr_decl:id ENTREGA ABREEMPAQUE expr_list:expr_l CIERRAEMPAQUE {: RESULT = (String)id + "::[" +(String)expr_l + "]"; :};
 
-arr_decl ::= LOCAL arr_id:id {: RESULT = id; :};
+arr_decl ::= LOCAL arr_id:id {: RESULT = (String)id; :};
 
-expr_list ::= expr:expr {: RESULT = (String) expr; :}
+expr_list ::= expr:expr {: RESULT = (String)expr; :}
             | expr:expr PINO expr_list:expr_l {: RESULT = (String)expr + ", " + (String)expr_l; :};
 
 /**********************************************************************************************************************/
@@ -168,11 +167,11 @@ stmt ::= init_stmt
 stmt_list ::= stmt stmt_list
             | ;
 
-expr_stmt ::= expr FINREGALO
+expr_stmt ::= expr:expr FINREGALO {: RESULT = expr; :}
             | FINREGALO;
 
 
-assg_stmt ::= mutable ENTREGA expr FINREGALO;
+assg_stmt ::= mutable:mut ENTREGA expr:expr FINREGALO {: RESULT = (String)mut + "<=" + (String)expr ; :};
 
 
 ctrl_struct_stmt ::= conditional_stmt
@@ -192,84 +191,82 @@ do_until_loop ::= HACE block REVISA ABRECUENTO expr CIERRACUENTO FINREGALO;
 for_loop ::= ENVUELVE ABRECUENTO var_init FINREGALO expr FINREGALO expr CIERRACUENTO block
            | ENVUELVE ABRECUENTO assg_stmt expr FINREGALO expr CIERRACUENTO block;
 
-input_output_stmt ::= read_stmt FINREGALO
-                    | write_stmt FINREGALO;
+input_output_stmt ::= read_stmt:stmt FINREGALO {: RESULT = stmt; :}
+                    | write_stmt:stmt FINREGALO {: RESULT = stmt; :};
 
-read_stmt ::= NARRA ABRECUENTO PERSONA CIERRACUENTO;
+write_stmt ::= ESCUCHA:wrt ABRECUENTO PERSONA:id CIERRACUENTO {: RESULT = (String)wrt + "(" + (String)id + ")"; :};
 
-write_stmt ::= ESCUCHA ABRECUENTO expr CIERRACUENTO;
+read_stmt ::= NARRA:prnt ABRECUENTO expr:expr CIERRACUENTO {: RESULT = (String)prnt + "(" + (String)expr + ")"; :};
 
-return_stmt ::= ENVIA expr_stmt;
+return_stmt ::= ENVIA:rtrn expr_stmt:expr_stmt {: RESULT = (String)rtrn + (String)expr_stmt; :};
 
-break_stmt ::= CORTA FINREGALO;
+break_stmt ::= CORTA:brk FINREGALO {: RESULT = (String)brk; :};
 
-expr ::= and_expr GASPAR expr
-       | and_expr;
-
-
-and_expr ::= not_expr MELCHOR and_expr
-           | not_expr;
+expr ::= and_expr:an_expr GASPAR:sym expr:expr {: RESULT = (String)an_expr + (String)sym + (String)expr; :}
+       | and_expr:an_expr {: RESULT = (String)an_expr; :};
 
 
-not_expr ::= BALTAZAR rel_expr
-           | rel_expr;
-
-rel_expr ::= add_sub_expr rel_op rel_expr
-           | add_sub_expr;
-
-rel_op ::= ALABASTER
-         | BUSHY
-         | PEPPER
-         | SUGARPLUM
-         | WUNORSE
-         | JINGLE;
+and_expr ::= not_expr:no_expr MELCHOR:sym and_expr:an_expr {: RESULT = (String)no_expr + (String)sym + (String)an_expr; :}
+           | not_expr:no_expr {: RESULT = (String)no_expr; :};
 
 
-add_sub_expr ::= mul_div_expr add_sub_ops add_sub_expr
-               | mul_div_expr;
+not_expr ::= BALTAZAR:sym rel_expr:re_expr {: RESULT = (String)sym + (String)re_expr; :}
+           | rel_expr: re_expr {: RESULT = (String)re_expr; :};
 
-add_sub_ops ::= DASHER
-              | DANCER;
+rel_expr ::= add_sub_expr:as_expr rel_op:sym rel_expr:re_expr {: RESULT = (String)as_expr + (String)sym + (String)re_expr; :}
+           | add_sub_expr:as_expr {: RESULT = (String)as_expr; :} ;
+
+rel_op ::= ALABASTER:sym {: RESULT = (String)sym; :}
+         | BUSHY:sym {: RESULT = (String)sym; :}
+         | PEPPER:sym {: RESULT = (String)sym; :}
+         | SUGARPLUM:sym {: RESULT = (String)sym; :}
+         | WUNORSE:sym {: RESULT = (String)sym; :}
+         | JINGLE:sym {: RESULT = (String)sym; :};
+
+add_sub_expr ::= mul_div_expr:md_expr add_sub_ops:sym add_sub_expr:as_expr {: RESULT = (String)md_expr + (String)sym + (String)as_expr; :}
+               | mul_div_expr:md_expr {: RESULT = (String)md_expr; :};
+
+add_sub_ops ::= DASHER:sym {: RESULT = (String)sym; :}
+              | DANCER:sym {: RESULT = (String)sym; :};
 
 
-mul_div_expr ::= exp_expr mul_div_ops mul_div_expr
-               | exp_expr;
+mul_div_expr ::= exp_expr:ex_expr mul_div_ops:sym mul_div_expr:md_expr {: RESULT = (String)ex_expr + (String)sym + (String)md_expr; :}
+               | exp_expr:ex_expr {: RESULT = (String)ex_expr; :};
 
-mul_div_ops ::= PRANCER
-              | VIXEN
-              | COMET;
+mul_div_ops ::= PRANCER:sym {: RESULT = (String)sym; :}
+              | VIXEN:sym {: RESULT = (String)sym; :}
+              | COMET:sym {: RESULT = (String)sym; :};
 
-exp_expr ::= un_arith_expr RUDOLPH exp_expr
-           | un_arith_expr;
+exp_expr ::= un_arith_expr:un_expr RUDOLPH:sym exp_expr:ex_expr {: RESULT = (String)un_expr + (String)sym + (String)ex_expr; :}
+           | un_arith_expr:un_expr {: RESULT = (String)un_expr; :};
 
+un_arith_expr ::= un_arith_ops:sym un_arith_expr:un_exp {: RESULT = (String)sym + (String)un_exp; :}
+                | factor:fact {: RESULT = (String)fact; :};
 
-un_arith_expr ::= un_arith_ops un_arith_expr
-                | factor;
+un_arith_ops ::= GRINCH:sym {: RESULT = (String)sym; :}
+               | QUIEN:sym {: RESULT = (String)sym; :}
+               | DANCER:sym {: RESULT = (String)sym; :};
 
-un_arith_ops ::= GRINCH
-               | QUIEN
-               | DANCER;
+factor ::= immutable:immut {: RESULT = (String)immut; :}
+         | mutable:mut {: RESULT = (String)mut; :};
 
-factor ::= immutable:immut {: RESULT = immut; :}
-         | mutable:mut {: RESULT = mut; :};
+mutable ::= PERSONA:id {: RESULT = (String)id; :}
+          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = (String)id + "[" + (String)expr + "]" ; :};
 
-mutable ::= PERSONA:id {: RESULT = id; :}
-          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = id + "[" + expr + "]" ; :};
+immutable ::= ABRECUENTO expr:expr CIERRACUENTO {: RESULT = "(" + (String)expr + ")"; :}
+            | call:call {: RESULT = (String)call; :}
+            | literal:lit {: RESULT = (String)lit; :};
 
-immutable ::= ABRECUENTO expr:expr CIERRACUENTO {: RESULT = "(" + expr + ")"; :}
-            | call:call {: RESULT = call; :}
-            | literal:l {: RESULT = l; :};
+call ::= PERSONA:id ABRECUENTO args:args CIERRACUENTO {: RESULT = (String)id + "(" + (String)args + ")"; :};
 
-call ::= PERSONA:id ABRECUENTO args:args CIERRACUENTO {: RESULT = id + "(" + args + ")"; :};
-
-args ::= arg_list:arg_l {: RESULT = arg_l; :}
-       | ;
+args ::= arg_list:arg_l {: RESULT = (String)arg_l; :}
+       | {: RESULT = ""; :};
 
 arg_list ::= expr:expr PINO arg_list:arg_l {: RESULT = (String)expr + ", " + (String)arg_l; :}
            | expr:expr {: RESULT = (String)expr;:};
 
-literal ::= L_SANTACLAUS: l_char {: RESULT = l_char; :}
-          | L_FATHERCHRISTMAS: l_int {: RESULT = l_int; :}
-          | L_KRISKRINGLE: l_flt {: RESULT = l_flt; :}
-          | L_SANNICOLAS: l_bool {: RESULT = l_bool; :}
-          | L_DEDMOROZ: l_str {: RESULT = l_str; :};
+literal ::= L_SANTACLAUS: l_char {: RESULT = (String)l_char; :}
+          | L_FATHERCHRISTMAS: l_int {: RESULT = (String)l_int; :}
+          | L_KRISKRINGLE: l_flt {: RESULT = (String)l_flt; :}
+          | L_SANNICOLAS: l_bool {: RESULT = (String)l_bool; :}
+          | L_DEDMOROZ: l_str {: RESULT = (String)l_str; :};

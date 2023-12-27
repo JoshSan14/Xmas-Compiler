@@ -77,49 +77,49 @@ l_string = \"
     "{" {return symbol(sym.ABREREGALO);}
     "}" {return symbol(sym.CIERRAREGALO);}
     // Lexemas de Estructuras de Control:
-    "if" {return symbol(sym.ELFO);}
-    "elif" {return symbol(sym.HADA);}
-    "else" {return symbol(sym.DUENDE);}
-    "for" {return symbol(sym.ENVUELVE);}
-    "do" {return symbol(sym.HACE);}
-    "until" {return symbol(sym.REVISA);}
-    "return" {return symbol(sym.ENVIA);}
-    "break" {return symbol(sym.CORTA);}
+    "if" {return symbol(sym.ELFO, yytext());}
+    "elif" {return symbol(sym.HADA, yytext());}
+    "else" {return symbol(sym.DUENDE, yytext());}
+    "for" {return symbol(sym.ENVUELVE, yytext());}
+    "do" {return symbol(sym.HACE, yytext());}
+    "until" {return symbol(sym.REVISA, yytext());}
+    "return" {return symbol(sym.ENVIA, yytext());}
+    "break" {return symbol(sym.CORTA, yytext());}
     // Lexemas de Lectura/Escritura
-    "print" {return symbol(sym.NARRA);}
-    "read" {return symbol(sym.ESCUCHA);}
+    "print" {return symbol(sym.NARRA, yytext());}
+    "read" {return symbol(sym.ESCUCHA, yytext());}
     // Lexema de Fin de Expresión
     "|" {return symbol(sym.FINREGALO);}
     // Lexema de Asignación
-    "<=" {return symbol(sym.ENTREGA);}
+    "<=" {return symbol(sym.ENTREGA, yytext());}
     // Local
-    "local" {return symbol(sym.LOCAL);}
+    "local" {return symbol(sym.LOCAL, yytext());}
     // Funcion
-    "function" {return symbol(sym.FUNCTION);}
+    "function" {return symbol(sym.FUNCTION, yytext());}
     // Caracteres
-        // Lexema Separador
-        "," {return symbol(sym.PINO);}
-        // Operadores Aritméticos Binarios
-        "+" {return symbol(sym.DASHER);}
-        "-" {return symbol(sym.DANCER);}
-        "*" {return symbol(sym.PRANCER);}
-        "/" {return symbol(sym.VIXEN);}
-        "~" {return symbol(sym.COMET);}
-        "**" {return symbol(sym.RUDOLPH);}
-        // Operadores Aritméticos Unarios
-        "++" {return symbol(sym.GRINCH);}
-        "--" {return symbol(sym.QUIEN);}
-        // Operadores Relacionales
-        "==" {return symbol(sym.ALABASTER);}
-        "!=" {return symbol(sym.BUSHY);}
-        ">" {return symbol(sym.PEPPER);}
-        "<" {return symbol(sym.SUGARPLUM);}
-        "=>" {return symbol(sym.WUNORSE);}
-        "=<" {return symbol(sym.JINGLE);}
-        // Operadores Lógicos
-        "^" {return symbol(sym.MELCHOR);}
-        "#" {return symbol(sym.GASPAR);}
-        "!" {return symbol(sym.BALTAZAR);}
+    // Lexema Separador
+    "," {return symbol(sym.PINO);}
+    // Operadores Aritméticos Binarios
+    "+" {return symbol(sym.DASHER, yytext());}
+    "-" {return symbol(sym.DANCER, yytext());}
+    "*" {return symbol(sym.PRANCER, yytext());}
+    "/" {return symbol(sym.VIXEN, yytext());}
+    "~" {return symbol(sym.COMET, yytext());}
+    "**" {return symbol(sym.RUDOLPH, yytext());}
+    // Operadores Aritméticos Unarios
+    "++" {return symbol(sym.GRINCH, yytext());}
+    "--" {return symbol(sym.QUIEN, yytext());}
+    // Operadores Relacionales
+    "==" {return symbol(sym.ALABASTER, yytext());}
+    "!=" {return symbol(sym.BUSHY, yytext());}
+    ">" {return symbol(sym.PEPPER, yytext());}
+    "<" {return symbol(sym.SUGARPLUM, yytext());}
+    "=>" {return symbol(sym.WUNORSE,yytext());}
+    "=<" {return symbol(sym.JINGLE, yytext());}
+    // Operadores Lógicos
+    "^" {return symbol(sym.MELCHOR, yytext());}
+    "#" {return symbol(sym.GASPAR, yytext());}
+    "!" {return symbol(sym.BALTAZAR, yytext());}
     // Identificador
     {identifier} {return symbol(sym.PERSONA, yytext());}
     // Manejo de errores

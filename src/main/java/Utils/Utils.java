@@ -1,11 +1,17 @@
 package Utils;
-
 import SymbolTable.*;
-
 import java.util.*;
 
 
 public class Utils {
+
+    /**
+     * Divide un mensaje en partes utilizando un símbolo dado y devuelve una lista de las partes resultantes.
+     *
+     * @param message El mensaje que se va a dividir.
+     * @param symbol El símbolo utilizado para dividir el mensaje.
+     * @return Una lista de partes del mensaje.
+     */
     public static List<String> splitMessage(String message, String symbol) {
         List<String> parts = new ArrayList<>();
 
@@ -15,14 +21,18 @@ public class Utils {
             String[] splitParts = message.split(symbol);
 
             // Add the parts to the list
-            for (String part : splitParts) {
-                parts.add(part);
-            }
+            parts.addAll(Arrays.asList(splitParts));
         }
 
         return parts;
     }
 
+    /**
+     * Divide un mensaje y agrega un símbolo correspondiente al mapa de símbolos.
+     *
+     * @param message El mensaje que se va a dividir y agregar al mapa de símbolos.
+     * @param symbols El mapa de símbolos al que se agregarán los símbolos divididos.
+     */
     public static void splitAddSym(String message, Map<String, TabSymbol> symbols) {
         List<String> symList = splitMessage(message, "::");
         System.out.println(message);
@@ -36,6 +46,13 @@ public class Utils {
         symbols.put(sym.getName(), sym);
     }
 
+    /**
+     * Divide un mensaje y agrega una tabla de símbolos de función correspondiente al gestor de tablas de símbolos.
+     *
+     * @param message El mensaje que se va a dividir y agregar como una tabla de símbolos de función.
+     * @param symbols El mapa de símbolos actual que se limpiará después de agregar la tabla de símbolos de función.
+     * @param manager El gestor de tablas de símbolos al que se agregará la nueva tabla de símbolos de función.
+     */
     public static void splitAddFunc(String message, Map<String, TabSymbol> symbols, SymbolTableManager manager) {
         List<String> symList = splitMessage(message, "::");
         System.out.println(message);

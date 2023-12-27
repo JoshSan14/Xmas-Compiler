@@ -6,30 +6,54 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-
-//import ParserLexer.parser;
 import java_cup.runtime.Symbol;
 import jflex.exceptions.SilentExit;
 
 public class MainJFlexCup {
 
+    /**
+     * Inicializa el lexer y el parser generando los archivos correspondientes.
+     *
+     * @param lexerRoute Ruta para generar el archivo del lexer.
+     * @param strArrParser Arreglo de argumentos para generar los archivos del parser.
+     * @throws internal_error Si se produce un error interno en el proceso.
+     * @throws Exception Si se produce un error general durante la inicialización.
+     */
     public void InitLexerParser(String lexerRoute, String[] strArrParser) throws internal_error, Exception {
         Generate_Lexer(lexerRoute);
         Generate_Parser(strArrParser);
     }
 
-    // Genera el archivo del lexer
+    /**
+     * Genera el archivo del lexer utilizando JFlex.
+     *
+     * @param route Ruta donde se generará el archivo del lexer.
+     * @throws IOException Si se produce un error de lectura o escritura.
+     * @throws SilentExit Si se produce un error silencioso en JFlex.
+     */
     public void Generate_Lexer(String route) throws IOException, SilentExit{
         String[] strArr = {route};
         jflex.Main.generate(strArr);
     }
 
-    // Genera los archivos del parser
+    /**
+     * Genera los archivos del parser utilizando JavaCup.
+     *
+     * @param strArr Arreglo de argumentos para generar los archivos del parser.
+     * @throws internal_error Si se produce un error interno en el proceso.
+     * @throws IOException Si se produce un error de lectura o escritura.
+     * @throws Exception Si se produce un error general durante la generación del parser.
+     */
     public void Generate_Parser(String[] strArr) throws internal_error, IOException, Exception{
         java_cup.Main.main(strArr);
     }
 
-
+    /**
+     * Realiza una prueba del lexer utilizando un archivo de entrada.
+     *
+     * @param scannerRoute Ruta del archivo de entrada para la prueba del lexer.
+     * @throws IOException Si se produce un error de lectura o escritura.
+     */
     public void LexerTest(String scannerRoute) throws IOException {
         Reader reader = new BufferedReader(new FileReader(scannerRoute));
         reader.read();
@@ -59,6 +83,12 @@ public class MainJFlexCup {
         }
     }
 
+    /**
+     * Realiza una prueba del parser utilizando un archivo de entrada.
+     *
+     * @param parseRoute Ruta del archivo de entrada para la prueba del parser.
+     * @throws Exception Si se produce un error durante el análisis sintáctico.
+     */
     public void ParserTest1(String parseRoute) throws Exception {
         Reader inputLexer = new FileReader(parseRoute);
         lexer myLexer = new lexer(inputLexer);
