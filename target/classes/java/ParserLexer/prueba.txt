@@ -1,0 +1,45 @@
+ boolean programaIniciado <= true|
+float num1 <= 1| @Iniciamos la variable num1 en 1
+float num2|
+num2 <= 2|
+float resultadoSuma <= num1 + num2|
+
+/_
+
+Este es un comentario multilinea
+haciendo presencia en el codigo actual.
+
+_/
+
+
+int numeroFavorito|
+numeroFavorito <= 10|
+string nombre <= "Ana Maria"|
+char genero <= 'f'|
+expresionMatematica <= 100-[7+(8-2)*4]/2
+int x <= 0|
+if ( x != -1 ){
+print("Iniciando programa")|
+@Aca vamos a usar el for para llegar hasta el numero favorito
+for ( x =< numeroFavorito| x <= x |++x ){
+print( x )|
+}
+}
+@ Ahora vamos a probar el manejo de errores de forma que no se realice el throw
+
+@ Un identificador incorrecto (Empieza con un numero):
+string 2apellido <= "Perez"|
+
+@Otro identificador incorrecto: (Empieza con caracter)
+string ]mascota <= "firulais"|
+
+@ Un entero pegado a letras:
+int primerNumero <= 23f|
+
+@ Un comentario sin cerrarse
+
+/_
+este es otro comentario
+multilinea,
+pero que no cierra
+
