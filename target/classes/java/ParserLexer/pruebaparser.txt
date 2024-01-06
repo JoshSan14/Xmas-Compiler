@@ -1,11 +1,12 @@
 function int main() {
-    local int ab|
+    locaz int ab
 }
 
-/_ Heelo _/
+/_ Comentario Multilinea _/
+@ Comentario simple
 
 function int func_a(int b[alfa(a, b, 1)], bool y, float x) {
-   local int i <= alfa() |
+   local int i <= alfa()|
    local char o|
    local bool bip <= alfa(a, b, c[0])|
 

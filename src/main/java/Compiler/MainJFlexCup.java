@@ -1,6 +1,7 @@
 package Compiler;
 import ParserLexer.lexer;
 import ParserLexer.parser;
+import Utils.Utils;
 import java_cup.internal_error;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -89,10 +90,11 @@ public class MainJFlexCup {
      * @param parseRoute Ruta del archivo de entrada para la prueba del parser.
      * @throws Exception Si se produce un error durante el análisis sintáctico.
      */
-    public void ParserTest1(String parseRoute) throws Exception {
+    public void ParserTest(String parseRoute) throws Exception {
         Reader inputLexer = new FileReader(parseRoute);
         lexer myLexer = new lexer(inputLexer);
         parser myParser = new parser(myLexer);
+        System.out.println("\n" + Utils.ANSI_BRIGHT_BLUE + "ANÁLISIS SINTÁCTICO" + Utils.ANSI_RESET);
         myParser.parse();
     }
 

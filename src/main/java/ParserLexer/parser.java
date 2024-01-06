@@ -601,13 +601,6 @@ public class parser extends java_cup.runtime.lr_parser {
 class CUP$parser$actions {
 
 
-    public void hola() {
-        System.out.println("hola");
-    }
-    public void adios() {
-        System.out.println("adios");
-    }
-
     private SymbolTableManager symTabMgr = new SymbolTableManager();
     private Map<String, TabSymbol> symbols = new HashMap<String, TabSymbol>();
 

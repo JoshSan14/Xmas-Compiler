@@ -55,7 +55,6 @@ public class Utils {
     public static void splitAddArray(String message, Map<String, TabSymbol> symbols) {
         List<String> symList = splitMessage(message, "::");
         TabSymbol sym;
-        System.out.println(symList.get(4));
         if (symList.get(3).equals("UND")) {
             sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=" + Utils.getArray(symList.get(4)).size());
         } else {

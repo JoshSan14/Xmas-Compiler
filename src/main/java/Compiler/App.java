@@ -1,7 +1,6 @@
 package Compiler;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class App
@@ -37,6 +36,6 @@ public class App
         GenerarLexerParser();
         MainJFlexCup mfjc = new MainJFlexCup();
         mfjc.LexerTest(System.getProperty("user.dir")+"\\src\\main\\java\\ParserLexer\\pruebaparser.txt");
-        mfjc.ParserTest1(System.getProperty("user.dir")+"\\src\\main\\java\\ParserLexer\\pruebaparser.txt");
+        mfjc.ParserTest(System.getProperty("user.dir")+"\\src\\main\\java\\ParserLexer\\pruebaparser.txt");
     }
 }
