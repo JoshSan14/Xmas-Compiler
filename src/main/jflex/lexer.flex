@@ -42,7 +42,7 @@ EnteroConLetras = [0-9]+[a-zA-Z]+
 // Literales:
 l_char = \'[^\']\' // Char
 l_int = {negative}(0|[1-9](\d*)) // Int
-l_float = {negative}{l_int}(\.\d*)? // Float
+l_float = {negative}(0|[1-9](\d*))(\.\d*)? // Float
 l_boolean = true | false // Bool
 l_string = \"
 

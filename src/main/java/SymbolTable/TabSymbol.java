@@ -1,5 +1,7 @@
 package SymbolTable;
 
+import Utils.Utils;
+
 public class TabSymbol {
     private String kind;
     private String name;
@@ -113,7 +115,13 @@ public class TabSymbol {
      */
     @Override
     public String toString() {
-        return "Type: " + type + ", Kind: " + kind ;
+        String str = "Type: " + type + ", Kind: " + kind;
+        if (kind.equals("array")){
+            return Utils.ANSI_GREEN + str +", Size: " + size + Utils.ANSI_RESET;
+        } else if (kind.equals("variable")){
+            return Utils.ANSI_ORANGE + str + Utils.ANSI_RESET;
+        } else {
+            return Utils.ANSI_PINK + str + Utils.ANSI_RESET;        }
     }
 
 }

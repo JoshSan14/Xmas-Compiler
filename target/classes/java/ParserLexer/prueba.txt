@@ -21,7 +21,7 @@ int x <= 0|
 if ( x != -1 ){
 print("Iniciando programa")|
 @Aca vamos a usar el for para llegar hasta el numero favorito
-for ( x =< numeroFavorito| x <= x |++x ){
+for ( x =< numeroFavorito| x <= x ++ ){
 print( x )|
 }
 }

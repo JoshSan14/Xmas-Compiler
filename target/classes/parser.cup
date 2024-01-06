@@ -28,7 +28,21 @@ parser code {:
         this.lex=lex;
         this.symbolFactory = new DefaultSymbolFactory();
     }
-:}
+
+    public final String ANSI_RESET = "\u001B[0m";
+    public final String ANSI_RED = "\u001B[31m";
+
+    // Metodo para reportar los errores sintacticos, pero funciona con ayuda de Recuperación en Modo Pánico + producciones de la gramatica
+    public void syntax_error(Symbol s){
+        System.out.println(Utils.ANSI_RED + "syntax_error: Error sintáctico '"+ s.value + "' en la línea: " + s.left + ", columna: " + s.right + Utils.ANSI_RESET);
+    }
+
+    // Metodo para reportar los errores irreparables
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+        System.out.println(Utils.ANSI_RED + "unrecovered_syntax_error: Error sintáctico inrecuperable '"+ s.value + "' en la línea: "+ s.left + ", columna: " + s.right + Utils.ANSI_RESET);
+    }
+
+:};
 
 /* define how to connect to the scanner! */
 init with {: :};
@@ -98,12 +112,10 @@ start with navidad;
 
 /**********************************************************************************************************************/
 
-navidad ::= func_decl_list {: System.out.println("ENTRY");
-                            symTabMgr.printAllTables();
-                            :};
+navidad ::= func_decl_list {: symTabMgr.printAllTables(); :};
 
 func_decl_list ::= func_decl
-                 | func_decl func_decl_list {: //System.out.println("FUNCTION LIST") ;:};
+                 | func_decl func_decl_list {: :};
 
 func_decl ::= FUNCTION identifier:id ABRECUENTO param_list CIERRACUENTO block {:
                          RESULT = "function::" + (String)id;
@@ -120,7 +132,7 @@ type ::= FATHERCHRISTMAS: t_int {: RESULT = (String)t_int; :}
 
 gen_id ::= type:tp PERSONA:id {: RESULT = (String)tp + "::" + (String)id; :};
 
-arr_id ::= gen_id:id ABREEMPAQUE CIERRAEMPAQUE {: RESULT = (String)id + "::UNDEFINED" ; :}
+arr_id ::= gen_id:id ABREEMPAQUE CIERRAEMPAQUE {: RESULT = (String)id + "::UND" ;  :}
          | gen_id:id ABREEMPAQUE expr:size CIERRAEMPAQUE {: RESULT = (String)id + "::" + (String)size; :};
 
 param_list ::= param:par {: RESULT = (String)par; :}
@@ -130,12 +142,13 @@ param_list ::= param:par {: RESULT = (String)par; :}
 param ::= identifier:id {: RESULT = "parameter::" + (String)id;
                            Utils.splitAddSym((String)RESULT, symbols); :};
 
-block ::= ABREREGALO stmt_list CIERRAREGALO;
+block ::= ABREREGALO stmt_list CIERRAREGALO
+        | error;
 
 init_stmt ::= var_decl_init:var FINREGALO {: RESULT = "variable::" + (String)var;
                                              Utils.splitAddSym((String)RESULT, symbols); :}
             | arr_decl_init:arr FINREGALO {: RESULT = "array::" + (String)arr;
-                                             Utils.splitAddSym((String)RESULT, symbols); :};
+                                             Utils.splitAddArray((String)RESULT, symbols); :};
 
 var_decl_init ::= var_init:var {: RESULT = (String)var; :}
                 | var_decl:var {: RESULT = (String)var; :};
@@ -170,9 +183,7 @@ stmt_list ::= stmt stmt_list
 expr_stmt ::= expr:expr FINREGALO {: RESULT = expr; :}
             | FINREGALO;
 
-
 assg_stmt ::= mutable:mut ENTREGA expr:expr FINREGALO {: RESULT = (String)mut + "<=" + (String)expr ; :};
-
 
 ctrl_struct_stmt ::= conditional_stmt
                    | iter_stmt;
@@ -205,10 +216,8 @@ break_stmt ::= CORTA:brk FINREGALO {: RESULT = (String)brk; :};
 expr ::= and_expr:an_expr GASPAR:sym expr:expr {: RESULT = (String)an_expr + (String)sym + (String)expr; :}
        | and_expr:an_expr {: RESULT = (String)an_expr; :};
 
-
 and_expr ::= not_expr:no_expr MELCHOR:sym and_expr:an_expr {: RESULT = (String)no_expr + (String)sym + (String)an_expr; :}
            | not_expr:no_expr {: RESULT = (String)no_expr; :};
-
 
 not_expr ::= BALTAZAR:sym rel_expr:re_expr {: RESULT = (String)sym + (String)re_expr; :}
            | rel_expr: re_expr {: RESULT = (String)re_expr; :};
@@ -249,8 +258,8 @@ un_arith_ops ::= GRINCH:sym {: RESULT = (String)sym; :}
 factor ::= immutable:immut {: RESULT = (String)immut; :}
          | mutable:mut {: RESULT = (String)mut; :};
 
-mutable ::= PERSONA:id {: RESULT = "id::" + (String)id; :}
-          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = "id::" + (String)id + "[" + (String)expr + "]" ; :};
+mutable ::= PERSONA:id {: RESULT = "id=" + (String)id; :}
+          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = (String)id + "[" + (String)expr + "]" ; :};
 
 immutable ::= ABRECUENTO expr:expr CIERRACUENTO {: RESULT = "(" + (String)expr + ")"; :}
             | call:call {: RESULT = (String)call; :}
@@ -264,8 +273,8 @@ args ::= arg_list:arg_l {: RESULT = (String)arg_l; :}
 arg_list ::= expr:expr PINO arg_list:arg_l {: RESULT = (String)expr + ", " + (String)arg_l; :}
            | expr:expr {: RESULT = (String)expr;:};
 
-literal ::= L_SANTACLAUS: l_char {: RESULT = "literal::char::" + (String)l_char; :}
-          | L_FATHERCHRISTMAS: l_int {: RESULT = "literal::int::" + (String)l_int; :}
-          | L_KRISKRINGLE: l_flt {: RESULT = "literal::float::" + (String)l_flt; :}
-          | L_SANNICOLAS: l_bool {: RESULT = "literal::bool::" + (String)l_bool; :}
-          | L_DEDMOROZ: l_str {: RESULT = "literal::string::" + (String)l_str; :};
+literal ::= L_SANTACLAUS: l_char {: RESULT = "char=" + (String)l_char; :}
+          | L_FATHERCHRISTMAS: l_int {: RESULT = "int=" + (String)l_int; :}
+          | L_KRISKRINGLE: l_flt {: RESULT = "float=" + (String)l_flt; :}
+          | L_SANNICOLAS: l_bool {: RESULT = "bool=" + (String)l_bool; :}
+          | L_DEDMOROZ: l_str {: RESULT = "string=" + (String)l_str; :};

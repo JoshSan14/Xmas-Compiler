@@ -5,6 +5,17 @@ import java.util.*;
 
 public class Utils {
 
+    //Colores
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PINK = "\u001B[35m";
+    public static final String ANSI_BRIGHT_BLUE = "\u001B[34;1m";
+    public static final String ANSI_ORANGE = "\u001B[38;5;208m"; // A mix of red and yellow
+
+
     /**
      * Divide un mensaje en partes utilizando un símbolo dado y devuelve una lista de las partes resultantes.
      *
@@ -37,11 +48,18 @@ public class Utils {
         List<String> symList = splitMessage(message, "::");
         System.out.println(message);
         TabSymbol sym;
-        if (Objects.equals(symList.get(0), "array")) {
-             sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), symList.get(3));
-        }
-        else {
-             sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1));
+        sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1));
+        symbols.put(sym.getName(), sym);
+    }
+
+    public static void splitAddArray(String message, Map<String, TabSymbol> symbols) {
+        List<String> symList = splitMessage(message, "::");
+        TabSymbol sym;
+        System.out.println(symList.get(4));
+        if (symList.get(3).equals("UND")) {
+            sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=" + Utils.getArray(symList.get(4)).size());
+        } else {
+            sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), symList.get(3));
         }
         symbols.put(sym.getName(), sym);
     }
@@ -61,6 +79,22 @@ public class Utils {
         manager.addSymbolTable(symTab);
         symbols.clear();
     }
+
+    public static List<String> getArray(String input) {
+
+        // Remove square brackets and split by ", " to get individual elements
+        String[] elements = input.substring(1, input.length() - 1).split(", ");
+
+        // Create a new ArrayList and add elements to it
+        List<String> stringList = new ArrayList<>(Arrays.asList(elements));
+
+        // Print the resulting list
+        return stringList;
+    }
+
+
+
+
 
 
 }

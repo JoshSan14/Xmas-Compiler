@@ -1,5 +1,7 @@
 package SymbolTable;
 
+import Utils.Utils;
+
 import java.util.Map;
 
 public class SymbolTable {
@@ -89,8 +91,8 @@ public class SymbolTable {
      */
     public void printSymbols() {
         System.out.println("*------------------------------------------------------*");
-        System.out.println("Function: " + name);
-        System.out.println("Return Type: " + returnType);
+        System.out.println("Function: " + Utils.ANSI_BRIGHT_BLUE + name + Utils.ANSI_RESET);
+        System.out.println("Return Type: " + Utils.ANSI_BLUE + returnType + Utils.ANSI_RESET);
         System.out.println("Symbols:");
 
         for (Map.Entry<String, TabSymbol> entry : symbols.entrySet()) {
