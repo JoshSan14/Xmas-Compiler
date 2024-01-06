@@ -78,195 +78,195 @@ terminal FUNCTION;
 
 // No terminales
 nonterminal navidad; //Inicial
-nonterminal block; // Bloque de código
-nonterminal type, arr_type; //Tipos y tipos de arreglo
-nonterminal func_decl, func_decl_list, var_decl, arr_decl; // Declaraciones
-nonterminal param_list, param; // Parámetros
-nonterminal var_decl_init, arr_decl_init; // Variables y arreglos inicializados
-nonterminal stmt, init_stmt, expr_stmt, assg_stmt, ctrl_struct_stmt, input_output_stmt, return_stmt, break_stmt; // Declaraciones
-nonterminal stmt_list; //Lista de declaraciones
-nonterminal conditional_stmt, iter_stmt; // Estructuras de control
-nonterminal elif_else;
-nonterminal do_until_loop, for_loop;
-nonterminal read_stmt, write_stmt;
-nonterminal expr, expr_list; // Expresiones
-nonterminal and_expr, not_expr, rel_expr, rel_op;
-nonterminal add_sub_expr, add_sub_ops;
-nonterminal mul_div_expr, mul_div_ops;
-nonterminal exp_expr;
-nonterminal un_arith_expr, un_arith_ops;
-nonterminal factor;
-nonterminal mutable, immutable; // Mutable o inmutable
-nonterminal call; // Llamada a función
-nonterminal args, arg_list; // Argumentos
-nonterminal literal; // Literales
-nonterminal gen_id, arr_id, identifier, var_init, arr_init;
+nonterminal caja; // Bloque de código
+nonterminal personajedenavidad, arr_type; //Tipos y tipos de arreglo
+nonterminal confites, sacoderegalos, portal, listadedeseos; // Declaraciones
+nonterminal trajesdesanta, lucesdenavidad; // Parámetros
+nonterminal barbadesanta, regalo; // Variables y arreglos inicializados
+nonterminal celebracionesnavidenas, jueguetes, frio, nieve, carta, contarhistorianavidena, nochebuena, amigosecreto; // Declaraciones
+nonterminal villancicos; //Lista de declaraciones
+nonterminal observarregalos, peliculanavidena; // Estructuras de control
+nonterminal papelderegalo;
+nonterminal familia, regalomanual;
+nonterminal leercarta, escribircarta;
+nonterminal tamales, trineo; // Expresiones
+nonterminal regaloprin, alegria, galletas, dulces;
+nonterminal juegos, jueguetenuevo;
+nonterminal sobre, campanas;
+nonterminal estrella;
+nonterminal juguetesenelarbol, regalocomprado;
+nonterminal cenafamiliar;
+nonterminal romperregalo, tiendadejuguetes; // Mutable o inmutable
+nonterminal devolverregalo; // Llamada a función
+nonterminal pelotasarbol, hojasarbol; // Argumentos
+nonterminal adornos ; // Literales
+nonterminal bolasdenavidad, bolsanavidena, identifier, carrito, decoracionnavidena;
 start with navidad;
 
 /**********************************************************************************************************************/
 
-navidad ::= func_decl_list {: symTabMgr.printAllTables(); :};
+navidad ::= sacoderegalos {: symTabMgr.printAllTables(); :};
 
-func_decl_list ::= func_decl
-                 | func_decl func_decl_list {: :};
+sacoderegalos ::= confites
+                 | confites sacoderegalos {: :};
 
-func_decl ::= FUNCTION identifier:id ABRECUENTO param_list CIERRACUENTO block {:
+confites ::= FUNCTION identifier:id ABRECUENTO trajesdesanta CIERRACUENTO caja {:
                          RESULT = "function::" + (String)id;
                          Utils.splitAddFunc((String)RESULT, symbols, symTabMgr); :};
 
-identifier ::= gen_id:id {: RESULT = (String)id; :}
-             | arr_id:id {: RESULT = (String)id; :};
+identifier ::= bolasdenavidad:id {: RESULT = (String)id; :}
+             | bolsanavidena:id {: RESULT = (String)id; :};
 
-type ::= FATHERCHRISTMAS: t_int {: RESULT = (String)t_int; :}
+personajedenavidad ::= FATHERCHRISTMAS: t_int {: RESULT = (String)t_int; :}
        | KRISKRINGLE: t_flt {: RESULT = (String)t_flt; :}
        | SANTACLAUS: t_char {: RESULT = (String)t_char; :}
        | DEDMOROZ: t_str {: RESULT = (String)t_str; :}
        | SANNICOLAS: t_bool {: RESULT = (String)t_bool; :};
 
-gen_id ::= type:tp PERSONA:id {: RESULT = (String)tp + "::" + (String)id; :};
+bolasdenavidad ::= personajedenavidad:tp PERSONA:id {: RESULT = (String)tp + "::" + (String)id; :};
 
-arr_id ::= gen_id:id ABREEMPAQUE CIERRAEMPAQUE {: RESULT = (String)id + "::UND" ;  :}
-         | gen_id:id ABREEMPAQUE expr:size CIERRAEMPAQUE {: RESULT = (String)id + "::" + (String)size; :};
+bolsanavidena ::= bolasdenavidad:id ABREEMPAQUE CIERRAEMPAQUE {: RESULT = (String)id + "::UND" ;  :}
+         | bolasdenavidad:id ABREEMPAQUE tamales:size CIERRAEMPAQUE {: RESULT = (String)id + "::" + (String)size; :};
 
-param_list ::= param:par {: RESULT = (String)par; :}
-             | param:par PINO param_list:par_l {: RESULT = (String)par + ", " + (String)par_l; :}
+trajesdesanta ::= lucesdenavidad:par {: RESULT = (String)par; :}
+             | lucesdenavidad:par PINO trajesdesanta:par_l {: RESULT = (String)par + ", " + (String)par_l; :}
              | {: RESULT = ""; :};
 
-param ::= identifier:id {: RESULT = "parameter::" + (String)id;
+lucesdenavidad ::= identifier:id {: RESULT = "parameter::" + (String)id;
                            Utils.splitAddSym((String)RESULT, symbols); :};
 
-block ::= ABREREGALO stmt_list CIERRAREGALO
+caja ::= ABREREGALO villancicos CIERRAREGALO
         | error;
 
-init_stmt ::= var_decl_init:var FINREGALO {: RESULT = "variable::" + (String)var;
+jueguetes ::= barbadesanta:var FINREGALO {: RESULT = "variable::" + (String)var;
                                              Utils.splitAddSym((String)RESULT, symbols); :}
-            | arr_decl_init:arr FINREGALO {: RESULT = "array::" + (String)arr;
+            | regalo:arr FINREGALO {: RESULT = "array::" + (String)arr;
                                              Utils.splitAddArray((String)RESULT, symbols); :};
 
-var_decl_init ::= var_init:var {: RESULT = (String)var; :}
-                | var_decl:var {: RESULT = (String)var; :};
+barbadesanta ::= carrito:var {: RESULT = (String)var; :}
+                | portal:var {: RESULT = (String)var; :};
 
-var_init ::= var_decl:var ENTREGA expr:expr {: RESULT = (String)var + "::" + (String)expr; :};
+carrito ::= portal:var ENTREGA tamales:tamales {: RESULT = (String)var + "::" + (String)tamales; :};
 
-var_decl ::= LOCAL gen_id:id {: RESULT = (String)id; :};
+portal ::= LOCAL bolasdenavidad:id {: RESULT = (String)id; :};
 
-arr_decl_init ::= arr_init:arr {: RESULT = (String)arr; :}
-                | arr_decl:arr {: RESULT = (String)arr; :};
+regalo ::= decoracionnavidena:arr {: RESULT = (String)arr; :}
+                | listadedeseos:arr {: RESULT = (String)arr; :};
 
-arr_init ::= arr_decl:id ENTREGA ABREEMPAQUE expr_list:expr_l CIERRAEMPAQUE {: RESULT = (String)id + "::[" +(String)expr_l + "]"; :};
+decoracionnavidena ::= listadedeseos:id ENTREGA ABREEMPAQUE trineo:expr_l CIERRAEMPAQUE {: RESULT = (String)id + "::[" +(String)expr_l + "]"; :};
 
-arr_decl ::= LOCAL arr_id:id {: RESULT = (String)id; :};
+listadedeseos ::= LOCAL bolsanavidena:id {: RESULT = (String)id; :};
 
-expr_list ::= expr:expr {: RESULT = (String)expr; :}
-            | expr:expr PINO expr_list:expr_l {: RESULT = (String)expr + ", " + (String)expr_l; :};
+trineo ::= tamales:tamales {: RESULT = (String)tamales; :}
+            | tamales:tamales PINO trineo:expr_l {: RESULT = (String)tamales + ", " + (String)expr_l; :};
 
 /**********************************************************************************************************************/
 
-stmt ::= init_stmt
-       | expr_stmt
-       | assg_stmt
-       | ctrl_struct_stmt
-       | input_output_stmt
-       | return_stmt
-       | break_stmt;
+celebracionesnavidenas ::= jueguetes
+       | frio
+       | nieve
+       | carta
+       | contarhistorianavidena
+       | nochebuena
+       | amigosecreto;
 
-stmt_list ::= stmt stmt_list
+villancicos ::= celebracionesnavidenas villancicos
             | ;
 
-expr_stmt ::= expr:expr FINREGALO {: RESULT = expr; :}
+frio ::= tamales:tamales FINREGALO {: RESULT = tamales; :}
             | FINREGALO;
 
-assg_stmt ::= mutable:mut ENTREGA expr:expr FINREGALO {: RESULT = (String)mut + "<=" + (String)expr ; :};
+nieve ::= romperregalo:mut ENTREGA tamales:tamales FINREGALO {: RESULT = (String)mut + "<=" + (String)tamales ; :};
 
-ctrl_struct_stmt ::= conditional_stmt
-                   | iter_stmt;
+carta ::= observarregalos
+                   | peliculanavidena;
 
-conditional_stmt ::= ELFO ABRECUENTO expr CIERRACUENTO block elif_else;
+observarregalos ::= ELFO ABRECUENTO tamales CIERRACUENTO caja papelderegalo;
 
-elif_else ::= HADA ABRECUENTO expr CIERRACUENTO block elif_else
-            | DUENDE block
+papelderegalo ::= HADA ABRECUENTO tamales CIERRACUENTO caja papelderegalo
+            | DUENDE caja
             | ;
 
-iter_stmt ::= do_until_loop
-            | for_loop;
+peliculanavidena ::= familia
+            | regalomanual;
 
-do_until_loop ::= HACE block REVISA ABRECUENTO expr CIERRACUENTO FINREGALO;
+familia ::= HACE caja REVISA ABRECUENTO tamales CIERRACUENTO FINREGALO;
 
-for_loop ::= ENVUELVE ABRECUENTO var_init FINREGALO expr FINREGALO expr CIERRACUENTO block
-           | ENVUELVE ABRECUENTO assg_stmt expr FINREGALO expr CIERRACUENTO block;
+regalomanual ::= ENVUELVE ABRECUENTO carrito FINREGALO tamales FINREGALO tamales CIERRACUENTO caja
+           | ENVUELVE ABRECUENTO nieve tamales FINREGALO tamales CIERRACUENTO caja;
 
-input_output_stmt ::= read_stmt:stmt FINREGALO {: RESULT = stmt; :}
-                    | write_stmt:stmt FINREGALO {: RESULT = stmt; :};
+contarhistorianavidena ::= leercarta:celebracionesnavidenas FINREGALO {: RESULT = celebracionesnavidenas; :}
+                    | escribircarta:celebracionesnavidenas FINREGALO {: RESULT = celebracionesnavidenas; :};
 
-write_stmt ::= ESCUCHA:wrt ABRECUENTO PERSONA:id CIERRACUENTO {: RESULT = (String)wrt + "(" + (String)id + ")"; :};
+escribircarta ::= ESCUCHA:wrt ABRECUENTO PERSONA:id CIERRACUENTO {: RESULT = (String)wrt + "(" + (String)id + ")"; :};
 
-read_stmt ::= NARRA:prnt ABRECUENTO expr:expr CIERRACUENTO {: RESULT = (String)prnt + "(" + (String)expr + ")"; :};
+leercarta ::= NARRA:prnt ABRECUENTO tamales:tamales CIERRACUENTO {: RESULT = (String)prnt + "(" + (String)tamales + ")"; :};
 
-return_stmt ::= ENVIA:rtrn expr_stmt:expr_stmt {: RESULT = (String)rtrn + (String)expr_stmt; :};
+nochebuena ::= ENVIA:rtrn frio:frio {: RESULT = (String)rtrn + (String)frio; :};
 
-break_stmt ::= CORTA:brk FINREGALO {: RESULT = (String)brk; :};
+amigosecreto ::= CORTA:brk FINREGALO {: RESULT = (String)brk; :};
 
-expr ::= and_expr:an_expr GASPAR:sym expr:expr {: RESULT = (String)an_expr + (String)sym + (String)expr; :}
-       | and_expr:an_expr {: RESULT = (String)an_expr; :};
+tamales ::= regaloprin:an_expr GASPAR:sym tamales:tamales {: RESULT = (String)an_expr + (String)sym + (String)tamales; :}
+       | regaloprin:an_expr {: RESULT = (String)an_expr; :};
 
-and_expr ::= not_expr:no_expr MELCHOR:sym and_expr:an_expr {: RESULT = (String)no_expr + (String)sym + (String)an_expr; :}
-           | not_expr:no_expr {: RESULT = (String)no_expr; :};
+regaloprin ::= alegria:no_expr MELCHOR:sym regaloprin:an_expr {: RESULT = (String)no_expr + (String)sym + (String)an_expr; :}
+           | alegria:no_expr {: RESULT = (String)no_expr; :};
 
-not_expr ::= BALTAZAR:sym rel_expr:re_expr {: RESULT = (String)sym + (String)re_expr; :}
-           | rel_expr: re_expr {: RESULT = (String)re_expr; :};
+alegria ::= BALTAZAR:sym galletas:re_expr {: RESULT = (String)sym + (String)re_expr; :}
+           | galletas: re_expr {: RESULT = (String)re_expr; :};
 
-rel_expr ::= add_sub_expr:as_expr rel_op:sym rel_expr:re_expr {: RESULT = (String)as_expr + (String)sym + (String)re_expr; :}
-           | add_sub_expr:as_expr {: RESULT = (String)as_expr; :} ;
+galletas ::= juegos:as_expr dulces:sym galletas:re_expr {: RESULT = (String)as_expr + (String)sym + (String)re_expr; :}
+           | juegos:as_expr {: RESULT = (String)as_expr; :} ;
 
-rel_op ::= ALABASTER:sym {: RESULT = (String)sym; :}
+dulces ::= ALABASTER:sym {: RESULT = (String)sym; :}
          | BUSHY:sym {: RESULT = (String)sym; :}
          | PEPPER:sym {: RESULT = (String)sym; :}
          | SUGARPLUM:sym {: RESULT = (String)sym; :}
          | WUNORSE:sym {: RESULT = (String)sym; :}
          | JINGLE:sym {: RESULT = (String)sym; :};
 
-add_sub_expr ::= mul_div_expr:md_expr add_sub_ops:sym add_sub_expr:as_expr {: RESULT = (String)md_expr + (String)sym + (String)as_expr; :}
-               | mul_div_expr:md_expr {: RESULT = (String)md_expr; :};
+juegos ::= sobre:md_expr jueguetenuevo:sym juegos:as_expr {: RESULT = (String)md_expr + (String)sym + (String)as_expr; :}
+               | sobre:md_expr {: RESULT = (String)md_expr; :};
 
-add_sub_ops ::= DASHER:sym {: RESULT = (String)sym; :}
+jueguetenuevo ::= DASHER:sym {: RESULT = (String)sym; :}
               | DANCER:sym {: RESULT = (String)sym; :};
 
 
-mul_div_expr ::= exp_expr:ex_expr mul_div_ops:sym mul_div_expr:md_expr {: RESULT = (String)ex_expr + (String)sym + (String)md_expr; :}
-               | exp_expr:ex_expr {: RESULT = (String)ex_expr; :};
+sobre ::= estrella:ex_expr campanas:sym sobre:md_expr {: RESULT = (String)ex_expr + (String)sym + (String)md_expr; :}
+               | estrella:ex_expr {: RESULT = (String)ex_expr; :};
 
-mul_div_ops ::= PRANCER:sym {: RESULT = (String)sym; :}
+campanas ::= PRANCER:sym {: RESULT = (String)sym; :}
               | VIXEN:sym {: RESULT = (String)sym; :}
               | COMET:sym {: RESULT = (String)sym; :};
 
-exp_expr ::= un_arith_expr:un_expr RUDOLPH:sym exp_expr:ex_expr {: RESULT = (String)un_expr + (String)sym + (String)ex_expr; :}
-           | un_arith_expr:un_expr {: RESULT = (String)un_expr; :};
+estrella ::= juguetesenelarbol:un_expr RUDOLPH:sym estrella:ex_expr {: RESULT = (String)un_expr + (String)sym + (String)ex_expr; :}
+           | juguetesenelarbol:un_expr {: RESULT = (String)un_expr; :};
 
-un_arith_expr ::= un_arith_ops:sym un_arith_expr:un_exp {: RESULT = (String)sym + (String)un_exp; :}
-                | factor:fact {: RESULT = (String)fact; :};
+juguetesenelarbol ::= regalocomprado:sym juguetesenelarbol:un_exp {: RESULT = (String)sym + (String)un_exp; :}
+                | cenafamiliar:fact {: RESULT = (String)fact; :};
 
-un_arith_ops ::= GRINCH:sym {: RESULT = (String)sym; :}
+regalocomprado ::= GRINCH:sym {: RESULT = (String)sym; :}
                | QUIEN:sym {: RESULT = (String)sym; :};
 
-factor ::= immutable:immut {: RESULT = (String)immut; :}
-         | mutable:mut {: RESULT = (String)mut; :};
+cenafamiliar ::= tiendadejuguetes:immut {: RESULT = (String)immut; :}
+         | romperregalo:mut {: RESULT = (String)mut; :};
 
-mutable ::= PERSONA:id {: RESULT = "id=" + (String)id; :}
-          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = "id=" + (String)id + "[" + (String)expr + "]" ; :};
+romperregalo ::= PERSONA:id {: RESULT = "id=" + (String)id; :}
+          | PERSONA:id ABREEMPAQUE tamales:tamales CIERRAEMPAQUE {: RESULT = "id=" + (String)id + "[" + (String)tamales + "]" ; :};
 
-immutable ::= ABRECUENTO expr:expr CIERRACUENTO {: RESULT = "(" + (String)expr + ")"; :}
-            | call:call {: RESULT = (String)call; :}
-            | literal:lit {: RESULT = (String)lit; :};
+tiendadejuguetes ::= ABRECUENTO tamales:tamales CIERRACUENTO {: RESULT = "(" + (String)tamales + ")"; :}
+            | devolverregalo:devolverregalo {: RESULT = (String)devolverregalo; :}
+            | adornos :lit {: RESULT = (String)lit; :};
 
-call ::= PERSONA:id ABRECUENTO args:args CIERRACUENTO {: RESULT = (String)id + "(" + (String)args + ")"; :};
+devolverregalo ::= PERSONA:id ABRECUENTO pelotasarbol:pelotasarbol CIERRACUENTO {: RESULT = (String)id + "(" + (String)pelotasarbol + ")"; :};
 
-args ::= arg_list:arg_l {: RESULT = (String)arg_l; :}
+pelotasarbol ::= hojasarbol:arg_l {: RESULT = (String)arg_l; :}
        | {: RESULT = ""; :};
 
-arg_list ::= expr:expr PINO arg_list:arg_l {: RESULT = (String)expr + ", " + (String)arg_l; :}
-           | expr:expr {: RESULT = (String)expr;:};
+hojasarbol ::= tamales:tamales PINO hojasarbol:arg_l {: RESULT = (String)tamales + ", " + (String)arg_l; :}
+           | tamales:tamales {: RESULT = (String)tamales;:};
 
-literal ::= L_SANTACLAUS: l_char {: RESULT = "char=" + (String)l_char; :}
+adornos  ::= L_SANTACLAUS: l_char {: RESULT = "char=" + (String)l_char; :}
           | L_FATHERCHRISTMAS: l_int {: RESULT = "int=" + (String)l_int; :}
           | L_KRISKRINGLE: l_flt {: RESULT = "float=" + (String)l_flt; :}
           | L_SANNICOLAS: l_bool {: RESULT = "bool=" + (String)l_bool; :}
