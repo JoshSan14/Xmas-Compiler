@@ -1768,7 +1768,7 @@ class CUP$parser$actions {
 		int exprleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int exprright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object expr = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		 RESULT = (String)id + "[" + (String)expr + "]" ; 
+		 RESULT = "id=" + (String)id + "[" + (String)expr + "]" ; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("mutable",42, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;

@@ -259,7 +259,7 @@ factor ::= immutable:immut {: RESULT = (String)immut; :}
          | mutable:mut {: RESULT = (String)mut; :};
 
 mutable ::= PERSONA:id {: RESULT = "id=" + (String)id; :}
-          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = (String)id + "[" + (String)expr + "]" ; :};
+          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = "id=" + (String)id + "[" + (String)expr + "]" ; :};
 
 immutable ::= ABRECUENTO expr:expr CIERRACUENTO {: RESULT = "(" + (String)expr + ")"; :}
             | call:call {: RESULT = (String)call; :}

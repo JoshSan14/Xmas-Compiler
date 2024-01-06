@@ -10,7 +10,7 @@ function int func_a(int b[alfa(a, b, 1)], bool y, float x) {
    local bool bip <= alfa(a, b, c[0])|
 
    local int carr[] <= [1, 12, 300]|
-   local char hiss[7*r+1.0+] <= ['a', 'a', 'd']|
+   local char hiss[7*r+1.0+7] <= ['a', 'a', 'd']|
    a <= 4|
 
    b[4] <= 8|
