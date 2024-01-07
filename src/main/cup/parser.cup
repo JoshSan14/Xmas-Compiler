@@ -77,30 +77,56 @@ terminal LOCAL;
 terminal FUNCTION;
 
 // No terminales
-nonterminal navidad; //Inicial
-nonterminal caja; // Bloque de código
-nonterminal personajedenavidad, arr_type; //Tipos y tipos de arreglo
-nonterminal confites, sacoderegalos, portal, listadedeseos; // Declaraciones
-nonterminal trajesdesanta, lucesdenavidad; // Parámetros
-nonterminal barbadesanta, regalo; // Variables y arreglos inicializados
-nonterminal celebracionesnavidenas, jueguetes, frio, nieve, carta, contarhistorianavidena, nochebuena, amigosecreto; // Declaraciones
-nonterminal villancicos; //Lista de declaraciones
-nonterminal observarregalos, peliculanavidena; // Estructuras de control
+
+// Inicial
+nonterminal navidad;
+// Bloque de código: block
+nonterminal caja;
+// Tipos y tipos de arreglo: type, arr_type
+nonterminal personajedenavidad, arr_type;
+// Declaraciones: func_decl, func_decl_list, var_decl, arr_decl
+nonterminal confites, sacoderegalos, portal, listadedeseos;
+// Parámetros: param_list, param
+nonterminal trajesdesanta, lucesdenavidad;
+// Variables y arreglos inicializados: var_decl_init, arr_decl_init
+nonterminal barbadesanta, regalo;
+// Declaraciones: stmt, init_stmt, expr_stmt, assg_stmt, ctrl_struct_stmt, input_output_stmt, return_stmt, break_stmt
+nonterminal celebracionesnavidenas, jueguetes, frio, nieve, carta, contarhistorianavidena, nochebuena, amigosecreto;
+// Lista de declaraciones: stmt_list
+nonterminal villancicos;
+// Estructuras de control: conditional_stmt, iter_stmt
+nonterminal observarregalos, peliculanavidena;
+//Estructuras de control condicional: elif_else
 nonterminal papelderegalo;
+// Bucles: do_until_loop, for_loop
 nonterminal familia, regalomanual;
+// Declaraciones de lectura y escritura: read_stmt, write_stmt
 nonterminal leercarta, escribircarta;
-nonterminal tamales, trineo; // Expresiones
+// Expresiones: expr, expr_list
+nonterminal tamales, trineo;
+// Operaciones: and_expr, not_expr, rel_expr, rel_op
 nonterminal regaloprin, alegria, galletas, dulces;
+// Operaciones: add_sub_expr, add_sub_ops
 nonterminal juegos, jueguetenuevo;
+// Operaciones: mul_div_expr, mul_div_ops
 nonterminal sobre, campanas;
+// Expresión: exp_expr
 nonterminal estrella;
+// Operaciones: un_arith_expr, un_arith_ops
 nonterminal juguetesenelarbol, regalocomprado;
+// Factor: factor
 nonterminal cenafamiliar;
-nonterminal romperregalo, tiendadejuguetes; // Mutable o inmutable
-nonterminal devolverregalo; // Llamada a función
-nonterminal pelotasarbol, hojasarbol; // Argumentos
-nonterminal adornos ; // Literales
+// Mutable o inmutable: mutable, immutable
+nonterminal romperregalo, tiendadejuguetes;
+// Llamada a función: call
+nonterminal devolverregalo;
+// Argumentos: args, arg_list
+nonterminal pelotasarbol, hojasarbol;
+// Literales: literal
+nonterminal adornos ;
+// Identificadores: gen_id, arr_id, identifier, var_init, arr_init
 nonterminal bolasdenavidad, bolsanavidena, identifier, carrito, decoracionnavidena;
+
 start with navidad;
 
 /**********************************************************************************************************************/
