@@ -7,6 +7,7 @@ public class TabSymbol {
     private String name;
     private String type;
     private String size;
+    private int number;
 
     /**
      * Constructor para parámetros y variables.
@@ -34,6 +35,21 @@ public class TabSymbol {
         this.name = name;
         this.type = type;
         this.size = size;
+    }
+
+    public TabSymbol(String kind, String name, String type, int number) {
+        this.kind = kind;
+        this.name = name;
+        this.type = type;
+        this.number = number;
+    }
+
+    public TabSymbol(String kind, String name, String type,  String size, int number) {
+        this.kind = kind;
+        this.name = name;
+        this.type = type;
+        this.size = size;
+        this.number = number;
     }
 
     /**
@@ -120,8 +136,11 @@ public class TabSymbol {
             return Utils.ANSI_GREEN + str +", Size: " + size + Utils.ANSI_RESET;
         } else if (kind.equals("variable")){
             return Utils.ANSI_ORANGE + str + Utils.ANSI_RESET;
+        } else if (kind.equals("parameter") && size != null){
+            return Utils.ANSI_PINK + str +", Size: " + size + ", Number: " + number + Utils.ANSI_RESET;
         } else {
-            return Utils.ANSI_PINK + str + Utils.ANSI_RESET;        }
+            return Utils.ANSI_PINK + str +  ", Number: " + number + Utils.ANSI_RESET;
+        }
     }
 
 }

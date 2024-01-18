@@ -2,9 +2,11 @@ package SymbolTable;
 
 import Utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class SymbolTable {
+    private ArrayList<String> paramTypes;
     private String name;
     private String returnType;
     private Map<String, TabSymbol> symbols;
@@ -16,10 +18,11 @@ public class SymbolTable {
      * @param returnType Tipo de retorno asociado a la función representada por la tabla de símbolos.
      * @param symbols    Mapa que contiene los símbolos asociados a la tabla.
      */
-    public SymbolTable(String name, String returnType, Map<String, TabSymbol> symbols) {
+    public SymbolTable(String name, String returnType, Map<String, TabSymbol> symbols, ArrayList<String> paramTypes) {
         this.name = name;
         this.returnType = returnType;
         this.symbols = symbols;
+        this.paramTypes = paramTypes;
     }
 
     /**
@@ -86,6 +89,14 @@ public class SymbolTable {
         return symbols.get(symName);
     }
 
+    public ArrayList<String> getParamTypes() {
+        return paramTypes;
+    }
+
+    public void setParamTypes(ArrayList<String> paramTypes) {
+        this.paramTypes = paramTypes;
+    }
+
     /**
      * Imprime en consola la información de la tabla de símbolos, incluyendo nombre, tipo de retorno y símbolos.
      */
@@ -100,6 +111,9 @@ public class SymbolTable {
             TabSymbol tabSymbol = entry.getValue();
             System.out.println("  " + symName + ": " + tabSymbol);
         }
+
+        System.out.println(this.paramTypes);
+
     }
 
 }

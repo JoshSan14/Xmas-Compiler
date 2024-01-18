@@ -2,6 +2,8 @@ package Utils;
 import SymbolTable.*;
 import java.util.*;
 
+import static Semantic.Semantic.semanticArray;
+
 
 public class Utils {
 
@@ -23,8 +25,8 @@ public class Utils {
      * @param symbol El símbolo utilizado para dividir el mensaje.
      * @return Una lista de partes del mensaje.
      */
-    public static List<String> splitMessage(String message, String symbol) {
-        List<String> parts = new ArrayList<>();
+    public static ArrayList<String> splitMessage(String message, String symbol) {
+        ArrayList<String> parts = new ArrayList<>();
 
         // Check if the message is not null and not empty
         if (message != null && !message.isEmpty()) {
@@ -45,18 +47,43 @@ public class Utils {
      * @param symbols El mapa de símbolos al que se agregarán los símbolos divididos.
      */
     public static void splitAddSym(String message, Map<String, TabSymbol> symbols) {
+        // Se separa la lista con el símbolo ::
         List<String> symList = splitMessage(message, "::");
-        System.out.println(message);
+        // Se imprime el mensaje
+        // Se genera el simbolo
         TabSymbol sym;
-        sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1));
-        symbols.put(sym.getName(), sym);
+        // Si el simbolo es un arreglo:
+        if (symList.size() > 4) {
+            // Parametros
+            if (symList.get(0).equals("parameter")) {
+                if (symList.get(3).equals("UND")) {
+                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=" + semanticArray(symList.get(3), symList.get(1)).size(), Integer.parseInt(symList.get(4)));
+                } else {
+                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), symList.get(3), Integer.parseInt(symList.get(4)));
+                }
+            // Simples
+            } else {
+                if (symList.get(3).equals("UND")) {
+                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=" + semanticArray(symList.get(3), symList.get(1)).size());
+                } else {
+                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), symList.get(3));
+                }
+            }
+        } else {
+            if (symList.get(0).equals("parameter")){
+                sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), Integer.parseInt(symList.get(3)));
+            } else {
+                sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1));
+            }
+        }
+        symbols.put(sym.getName(), sym);// Si el simbolo es simple
     }
 
     public static void splitAddArray(String message, Map<String, TabSymbol> symbols) {
         List<String> symList = splitMessage(message, "::");
         TabSymbol sym;
         if (symList.get(3).equals("UND")) {
-            sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=" + Utils.getArray(symList.get(4)).size());
+            sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=" + semanticArray(symList.get(4), symList.get(1)).size());
         } else {
             sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), symList.get(3));
         }
@@ -70,30 +97,32 @@ public class Utils {
      * @param symbols El mapa de símbolos actual que se limpiará después de agregar la tabla de símbolos de función.
      * @param manager El gestor de tablas de símbolos al que se agregará la nueva tabla de símbolos de función.
      */
-    public static void splitAddFunc(String message, Map<String, TabSymbol> symbols, SymbolTableManager manager) {
+    public static void splitAddFunc(String message, Map<String, TabSymbol> symbols, SymbolTableManager manager, ArrayList<String> parameters) {
         List<String> symList = splitMessage(message, "::");
-        System.out.println(message);
         Map<String, TabSymbol> funcSyms = new HashMap<String, TabSymbol>(symbols);
-        SymbolTable symTab = new SymbolTable(symList.get(2), symList.get(1), funcSyms);
+        SymbolTable symTab = new SymbolTable(symList.get(2), symList.get(1), funcSyms, parameters);
         manager.addSymbolTable(symTab);
         symbols.clear();
     }
 
-    public static List<String> getArray(String input) {
-
-        // Remove square brackets and split by ", " to get individual elements
-        String[] elements = input.substring(1, input.length() - 1).split(", ");
-
-        // Create a new ArrayList and add elements to it
-        List<String> stringList = new ArrayList<>(Arrays.asList(elements));
-
-        // Print the resulting list
-        return stringList;
+    public static boolean containsValue(String[] array, String targetValue) {
+        for (String element : array) {
+            if (element.equals(targetValue)) {
+                return true;
+            }
+        }
+        return false;
     }
 
+    public static <T> List<T> removeDuplicates(List<T> list) {
+        // Create a HashSet to store unique elements
+        HashSet<T> uniqueSet = new HashSet<>(list);
 
+        // Create a new list without duplicates using the HashSet
+        List<T> result = new ArrayList<>(uniqueSet);
 
-
+        return result;
+    }
 
 
 }

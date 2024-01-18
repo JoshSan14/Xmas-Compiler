@@ -30,7 +30,8 @@ public class SymbolTableManager {
      * @return Tabla de símbolos asociada a la función, o null si no se encuentra.
      */
     public SymbolTable getSymbolTable(String functionName) {
-        return functions.get(functionName);
+        SymbolTable symbolTable = functions.get(functionName);
+        return symbolTable;
     }
 
     /**

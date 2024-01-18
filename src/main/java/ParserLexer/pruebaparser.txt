@@ -1,50 +1,18 @@
-function int main() {
-    locaz int ab
+ function int main() {
+    local int ab|
 }
 
 /_ Comentario Multilinea _/
 @ Comentario simple
 
-function int func_a(int b[alfa(a, b, 1)], bool y, float x) {
-   local int i <= alfa()|
-   local char o|
-   local bool bip <= alfa(a, b, c[0])|
-
-   local int carr[] <= [1, 12, 300]|
-   local char hiss[7*r+1.0+7] <= ['a', 'a', 'd']|
-   a <= 4|
-
-   b[4] <= 8|
-
-   if(a == 9) {
-      a <= 0|
-   }
-   elif (a =< 8) {
-      a <= 10|
-   }
-   elif (a =< 11) {
-      if(b =< 10) {
-        b <= 11|
-      }
-   } else {
-    a <= 10|
-   }
-
-   read(a)|
-   print(a+b)|
-   local string var_str <= "Hello"|
-
-   return a|
-
-   do {
-     ++a |
-   } until ( a => 8) |
-
-    for (i <= 0 | ++i | i =< 10) {
-        i <= i + 1|
-    }
-
-    local int xyz <= (x + y + z) ** (alfa(a, b, c) - ---5 / ++y)|
+function int alfa(string y, float u){
 
 }
+
+function int func_a(int a, float b) {
+    local int x|
+    local int xyz <= a|
+}
+
+
 
