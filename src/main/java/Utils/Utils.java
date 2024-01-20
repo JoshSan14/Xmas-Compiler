@@ -57,16 +57,16 @@ public class Utils {
             // Parametros
             if (symList.get(0).equals("parameter")) {
                 if (symList.get(3).equals("UND")) {
-                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=" + semanticArray(symList.get(3), symList.get(1)).size(), Integer.parseInt(symList.get(4)));
+                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1) + "[]", "int=" + semanticArray(symList.get(3), symList.get(1)).size(), Integer.parseInt(symList.get(4)));
                 } else {
-                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), symList.get(3), Integer.parseInt(symList.get(4)));
+                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1) + "[]", symList.get(3), Integer.parseInt(symList.get(4)));
                 }
             // Simples
             } else {
                 if (symList.get(3).equals("UND")) {
-                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=" + semanticArray(symList.get(3), symList.get(1)).size());
+                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1) + "[]", "int=" + semanticArray(symList.get(3), symList.get(1)).size());
                 } else {
-                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), symList.get(3));
+                    sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1) + "[]", symList.get(3));
                 }
             }
         } else {
@@ -82,10 +82,12 @@ public class Utils {
     public static void splitAddArray(String message, Map<String, TabSymbol> symbols) {
         List<String> symList = splitMessage(message, "::");
         TabSymbol sym;
-        if (symList.get(3).equals("UND")) {
+        if (symList.size() > 4 && symList.get(3).equals("UND")) {
             sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=" + semanticArray(symList.get(4), symList.get(1)).size());
+        } else if (symList.get(3).equals("UND")){
+            sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), "int=0");
         } else {
-            sym = new TabSymbol(symList.get(0), symList.get(2), symList.get(1), symList.get(3));
+            sym = new TabSymbol(symList.get(0), symList.get(2),symList.get(1), symList.get(3));
         }
         symbols.put(sym.getName(), sym);
     }

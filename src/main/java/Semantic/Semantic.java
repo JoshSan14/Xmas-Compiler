@@ -18,16 +18,13 @@ public class Semantic {
     public final static String boolRegex = "bool=(true|false)";
     public final static String stringRegex = "string=\"(?:[^\"]|\\.)*\"";
     public final static String charRegex = "char='([^'\\\\]|\\\\.)'";
-
     public final static String literalRegex = "(" + intRegex + ")|(" + floatRegex + ")|(" + boolRegex + ")|(" + stringRegex + ")|(" + charRegex + ")";
-
     public final static String callRegex = "call=[\\w]+\\([^)]*\\)";
     public final static String idRegex = "id=[\\w]+";
     public final static String allRegex = "(" + literalRegex + ")|(" + callRegex + ")|(" + idRegex + ")";
 
-
     public static List<String> semanticArray(String input, String valueType) throws IllegalArgumentException {
-        List<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<String>();
 
         // Validate valueType
         if (!("int".equals(valueType) || "char".equals(valueType))) {
@@ -53,102 +50,24 @@ public class Semantic {
         return result;
     }
 
-
-
-    private static List<String> analyzePattern(String input, String regex) {
-        List<String> resultList = new ArrayList<>();
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-
-        while (matcher.find()) {
-            resultList.add(matcher.group());
-        }
-
-        resultList = Utils.removeDuplicates(resultList);
-
-        return resultList;
-    }
-
-    private static void extractAndAppend(String inputString, List<String> resultList, String regex) {
-        // Define the pattern you want to match
-        Pattern pattern = Pattern.compile(regex);
-
-        // Create a matcher object using the pattern
-        Matcher matcher = pattern.matcher(inputString);
-
-        // Check if the pattern is found in the input string
-        if (matcher.find()) {
-            // Extract the matched part (group 1 in this case)
-            String matchedPart = matcher.group(1);
-
-            // Append the matched part to the result list
-            resultList.add(matchedPart);
-        }
-    }
-
-    private static boolean funcTypeCheck(SymbolTableManager manager, String funcName, String typeCheck) throws IllegalArgumentException {
+    public static boolean funcTypeCheck(String funcName, SymbolTableManager manager, String typeCheck) {
         SymbolTable function = manager.getSymbolTable(funcName);
-
-        if (function == null) {
-            throw new IllegalArgumentException("Error Semántico: La función " + funcName + " no se encuentra declarada.");
-        }
-
-        return function.getReturnType().equals(typeCheck);
+        String funcType = function.getReturnType();
+        return funcType.equals(typeCheck);
     }
 
     public static boolean idTypeCheck(Map<String, TabSymbol> symbols, String idName, String typeCheck) throws IllegalArgumentException {
         TabSymbol id = symbols.get(idName);
-        System.out.println(symbols);
-        if (id == null) {
-            throw new IllegalArgumentException("Error Semántico: IDNF" + idName);
-        }
-
-        return id.getType().equals(typeCheck);
+        String idType = id.getType();
+        return idType.equals(typeCheck);
     }
 
-    public static boolean litTypeCheck(String litType, String checkType) {
-        return litType.equals(checkType);
+    public static boolean litTypeCheck(String literal, String typeCheck) {
+        String litType = Utils.splitMessage(literal, "=").get(0);
+        return litType.equals(typeCheck);
     }
 
-
-    public static void traverseExpression(String expression) {
-        String regex = "(<(LOGIC|REL|ARITH)>((<OP1>.*</OP1>)?(<SYM>.{1,2}</SYM>)(<OP2>.*</OP2>))(</\\2>))";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(expression);
-
-        while (matcher.find()) {
-            String operationType = matcher.group(4);
-            String operandContent = matcher.group(0);
-            //String symbolContent = matcher.group(0);
-            //String nestedOperation = matcher.group(0);
-
-            System.out.println("Operation Type: " + operationType);
-            System.out.println("Operand Content: " + operandContent);
-            // System.out.println("Symbol Content: " + symbolContent);
-            // System.out.println("Nested Operation: " + nestedOperation);
-        }
-    }
-
-    private static void processOperandsAndSymbols(String content) {
-        Pattern operandPattern = Pattern.compile("<OP>(.*?)</OP>");
-        Pattern symbolPattern = Pattern.compile("<SYM>(.*?)</SYM>");
-
-        Matcher operandMatcher = operandPattern.matcher(content);
-        Matcher symbolMatcher = symbolPattern.matcher(content);
-
-        int operandCount = 0;
-
-        while (operandMatcher.find()) {
-            operandCount++;
-            System.out.println("  Operand " + operandCount + ": " + operandMatcher.group(1));
-        }
-
-        while (symbolMatcher.find()) {
-            System.out.println("  Symbol: " + symbolMatcher.group(1));
-        }
-    }
-
-}
+   }
 
 
 

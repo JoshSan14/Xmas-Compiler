@@ -141,7 +141,8 @@ param_list ::= param:par {: RESULT = (String)par; :}
 
 param ::= identifier:id {: RESULT = "parameter::" + (String)id + "::" + paramCount;
                            paramCount++;
-                           parameters.add(Utils.splitMessage((String)RESULT,"::").get(1));
+                           ArrayList<String> params = Utils.splitMessage((String)RESULT,"::");
+                           parameters.add(params.get(1));
                            Utils.splitAddSym((String)RESULT, symbols); :};
 
 block ::= ABREREGALO stmt_list CIERRAREGALO
@@ -150,7 +151,7 @@ block ::= ABREREGALO stmt_list CIERRAREGALO
 init_stmt ::= var_decl_init:var FINREGALO {: RESULT = "variable::" + (String)var;
                                              Utils.splitAddSym((String)RESULT, symbols); :}
             | arr_decl_init:arr FINREGALO {: RESULT = "array::" + (String)arr;
-                                             Utils.splitAddArray((String)RESULT, symbols); :};
+                                             Utils.splitAddSym((String)RESULT, symbols); :};
 
 var_decl_init ::= var_init:var {: RESULT = (String)var; :}
                 | var_decl:var {: RESULT = (String)var; :};
@@ -160,7 +161,7 @@ RESULT = (String)var + "::" + (String)expr;
 System.out.println(RESULT);
 symList = Utils.splitMessage((String)RESULT, "::");
 System.out.println(symbols);
-XMLTree.checkExpressionType((String)expr, symList.get(0), symbols);
+ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTabMgr);
 :};
 
 var_decl ::= LOCAL gen_id:id {: RESULT = (String)id; :};
@@ -266,22 +267,22 @@ un_arith_ops ::= GRINCH:sym {: RESULT = (String)sym; :}
                | QUIEN:sym {: RESULT = (String)sym; :};
 
 factor ::= immutable:immut {: RESULT = (String)immut; :}
-         | mutable:mut {: RESULT = "<ID>id=" + (String)mut + "</ID>"; :};
+         | mutable:mut {: RESULT = "<ID>" + (String)mut + "</ID>"; :};
 
 mutable ::= PERSONA:id {: RESULT = (String)id; :}
           | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = (String)id + "[" + (String)expr + "]" ; :};
 
 immutable ::= ABRECUENTO expr:expr CIERRACUENTO {: RESULT = expr; :}
-            | call:call {: RESULT = "<CALL>call=" + (String)call + "</CALL>"; :}
+            | call:call {: RESULT = "<CALL>" + (String)call + "</CALL>"; :}
             | literal:lit {: RESULT = "<LITERAL>" + (String)lit + "</LITERAL>"; :};
 
-call ::= PERSONA:id ABRECUENTO args:args CIERRACUENTO {: RESULT = (String)id + "(" + (String)args + ")"; :};
+call ::= PERSONA:id ABRECUENTO args:args CIERRACUENTO {: RESULT = "<FUNC>" + (String)id + "</FUNC><ARGUMENTS>" + (String)args + "</ARGUMENTS>"; :};
 
 args ::= arg_list:arg_l {: RESULT = (String)arg_l; :}
        | {: RESULT = ""; :};
 
-arg_list ::= expr:expr PINO arg_list:arg_l {: RESULT = (String)expr + ", " + (String)arg_l; :}
-           | expr:expr {: RESULT = (String)expr;:};
+arg_list ::= expr:expr PINO arg_list:arg_l {: RESULT = "<ARG>" + (String)expr + "</ARG>" + (String)arg_l; :}
+           | expr:expr {: RESULT = "<ARG>" + (String)expr + "</ARG>";:};
 
 literal ::= L_SANTACLAUS: l_char {: RESULT = "char=" + (String)l_char; :}
           | L_FATHERCHRISTMAS: l_int {: RESULT = "int=" + (String)l_int; :}

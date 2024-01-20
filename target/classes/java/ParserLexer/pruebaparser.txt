@@ -5,14 +5,17 @@
 /_ Comentario Multilinea _/
 @ Comentario simple
 
-function int alfa(string y, float u){
+function int alfa(int y[], float u, int a){
 
 }
 
-function int func_a(int a, float b) {
-    local int x|
-    local int xyz <= a|
+function int beta(int i, float f){
+
 }
 
+function int func_a(int a, float b, int f) {
+    local float x|
+    local int xyz <= 4 + (beta(5, 5.0) + ((4 + (4 * (9 + 11 + x + 12)) * 4)))|
+}
 
 

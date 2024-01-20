@@ -858,7 +858,8 @@ class CUP$parser$actions {
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		 RESULT = "parameter::" + (String)id + "::" + paramCount;
                            paramCount++;
-                           parameters.add(Utils.splitMessage((String)RESULT,"::").get(1));
+                           ArrayList<String> params = Utils.splitMessage((String)RESULT,"::");
+                           parameters.add(params.get(1));
                            Utils.splitAddSym((String)RESULT, symbols); 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("param",9, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -903,7 +904,7 @@ class CUP$parser$actions {
 		int arrright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object arr = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		 RESULT = "array::" + (String)arr;
-                                             Utils.splitAddArray((String)RESULT, symbols); 
+                                             Utils.splitAddSym((String)RESULT, symbols); 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("init_stmt",13, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -947,7 +948,7 @@ RESULT = (String)var + "::" + (String)expr;
 System.out.println(RESULT);
 symList = Utils.splitMessage((String)RESULT, "::");
 System.out.println(symbols);
-XMLTree.checkExpressionType((String)expr, symList.get(0), symbols);
+ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTabMgr);
 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("var_init",51, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1751,7 +1752,7 @@ XMLTree.checkExpressionType((String)expr, symList.get(0), symbols);
 		int mutleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int mutright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object mut = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = "<ID>id=" + (String)mut + "</ID>"; 
+		 RESULT = "<ID>" + (String)mut + "</ID>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("factor",41, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1802,7 +1803,7 @@ XMLTree.checkExpressionType((String)expr, symList.get(0), symbols);
 		int callleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int callright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object call = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = "<CALL>call=" + (String)call + "</CALL>"; 
+		 RESULT = "<CALL>" + (String)call + "</CALL>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("immutable",43, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1829,7 +1830,7 @@ XMLTree.checkExpressionType((String)expr, symList.get(0), symbols);
 		int argsleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int argsright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object args = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		 RESULT = (String)id + "(" + (String)args + ")"; 
+		 RESULT = "<FUNC>" + (String)id + "</FUNC><ARGUMENTS>" + (String)args + "</ARGUMENTS>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("call",44, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1865,7 +1866,7 @@ XMLTree.checkExpressionType((String)expr, symList.get(0), symbols);
 		int arg_lleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int arg_lright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object arg_l = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = (String)expr + ", " + (String)arg_l; 
+		 RESULT = "<ARG>" + (String)expr + "</ARG>" + (String)arg_l; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("arg_list",46, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1877,7 +1878,7 @@ XMLTree.checkExpressionType((String)expr, symList.get(0), symbols);
 		int exprleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int exprright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object expr = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = (String)expr;
+		 RESULT = "<ARG>" + (String)expr + "</ARG>";
               CUP$parser$result = parser.getSymbolFactory().newSymbol("arg_list",46, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
