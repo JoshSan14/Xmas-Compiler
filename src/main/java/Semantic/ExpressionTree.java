@@ -15,16 +15,33 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class ExpressionTree {
+
+    /**
+     * Realiza la verificación semántica del tipo de expresión contenida en una cadena XML.
+     *
+     * @param xmlString   Cadena XML que representa la expresión a verificar.
+     * @param typeCheck    Tipo esperado para la expresión.
+     * @param symbols      Mapa de símbolos que contiene información sobre las variables.
+     * @param manager      Gestor de la tabla de símbolos.
+     * @return Nombre de la etiqueta raíz de la expresión.
+     * @throws Exception   Excepción en caso de error durante el análisis o la verificación semántica.
+     */
     public static String checkExpressionType(String xmlString, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
 
+        // Construir el analizador de documentos XML
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+        // Analizar la cadena XML y obtener el documento
         Document document = builder.parse(new InputSource(new StringReader(xmlString)));
 
+        // Obtener el elemento raíz del documento XML
         Element rootElement = document.getDocumentElement();
         String rootTagName = rootElement.getTagName();
 
-        System.out.println("Parsed XML Document:\n" + convertDocumentToString(document));
+        // Imprimir información sobre el documento XML analizado
+        System.out.println("Documento XML analizado:\n" + convertDocumentToString(document));
 
+        // Realizar la verificación semántica según la etiqueta raíz de la expresión
         if ("ARRAY".equals(rootTagName) && ((typeCheck.equals("int") || typeCheck.equals("char")))) {
             processArray(rootElement, typeCheck, symbols, manager);
         } else if ("ARR_ELEM".equals(rootTagName)) {
@@ -47,54 +64,63 @@ public class ExpressionTree {
                 case "CALL" -> {
                     String funcName = rootElement.getElementsByTagName("FUNC").item(0).getTextContent();
                     if (!Semantic.funcTypeCheck(funcName, manager, typeCheck)) {
-                        throw new IllegalArgumentException("Error Semántico en expresión aritmética: La funcion \"" + funcName + "\" retorna tipo \"" + typeCheck + "\"");
+                        throw new IllegalArgumentException("Error Semántico en expresión aritmética: La función \"" + funcName + "\" retorna tipo \"" + typeCheck + "\"");
                     }
                     processCall(rootElement, symbols, manager);
                 }
-
             }
         }
 
         return rootTagName;
     }
 
+    /**
+     * Recorre un nodo XML y realiza análisis semántico según la etiqueta del nodo y su contenido.
+     *
+     * @param node       Nodo XML que se va a recorrer.
+     * @param typeCheck  Tipo esperado para la expresión.
+     * @param symbols    Mapa de símbolos que contiene información sobre las variables.
+     * @param manager    Gestor de la tabla de símbolos.
+     * @return Resultado del recorrido, incluyendo información sobre elementos OP1, OP2 y SYM.
+     */
     private static String traverseNode(Node node, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) {
         StringBuilder result = new StringBuilder();
 
-        // Check for OP1, OP2, and SYM elements and extract their values
+        // Verificar si el nodo es de tipo ELEMENT_NODE
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             Element element = (Element) node;
 
+            // Verificar si el elemento es OP1, OP2 o SYM y extraer sus valores
             if ("OP1".equals(element.getTagName()) || "OP2".equals(element.getTagName()) || "SYM".equals(element.getTagName())) {
                 result.append(element.getTagName()).append(": ").append(extractValue(element)).append("\n");
             } else if ("LOGIC".equals(element.getTagName())) {
-                // Perform checkLogicChildren analysis for "LOGIC" element
+                // Realizar análisis checkLogicChildren para el elemento "LOGIC"
                 try {
                     checkLogicExpr(element, typeCheck, symbols, manager);
                 } catch (Exception e) {
-                    // Handle the exception if needed
+                    // Manejar la excepción si es necesario
                     e.printStackTrace();
                 }
             } else if ("REL".equals(element.getTagName())) {
-                // Perform checkLogicChildren analysis for "LOGIC" element
+                // Realizar análisis checkRelExpr para el elemento "REL"
                 try {
                     checkRelExpr(element, typeCheck, symbols, manager);
                 } catch (Exception e) {
-                    // Handle the exception if needed
+                    // Manejar la excepción si es necesario
                     e.printStackTrace();
                 }
             } else if ("ARITH".equals(element.getTagName())) {
-                // Perform checkLogicChildren analysis for "LOGIC" element
+                // Realizar análisis checkArithExpr para el elemento "ARITH"
                 try {
                     checkArithExpr(element, typeCheck, symbols, manager);
                 } catch (Exception e) {
-                    // Handle the exception if needed
+                    // Manejar la excepción si es necesario
                     e.printStackTrace();
                 }
             }
         }
 
-        // Recursively traverse child nodes
+        // Recorrer de manera recursiva los nodos hijos
         NodeList childNodes = node.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
@@ -104,10 +130,17 @@ public class ExpressionTree {
         return result.toString();
     }
 
+    /**
+     * Extrae y concatena el contenido de texto de un elemento XML.
+     *
+     * @param element Elemento XML del cual se extrae el contenido de texto.
+     * @return Contenido de texto del elemento XML.
+     */
     private static String extractValue(Element element) {
         NodeList textNodes = element.getChildNodes();
         StringBuilder value = new StringBuilder();
 
+        // Recorrer los nodos hijos y extraer el contenido de texto
         for (int i = 0; i < textNodes.getLength(); i++) {
             Node textNode = textNodes.item(i);
             if (textNode.getNodeType() == Node.TEXT_NODE) {
@@ -115,7 +148,7 @@ public class ExpressionTree {
             }
         }
 
-        // Check if the element has child elements (non-leaf node)
+        // Verificar si el elemento tiene elementos hijos (nodo no hoja)
         if (element.getFirstChild() != null && element.getFirstChild().getNodeType() == Node.ELEMENT_NODE) {
             return "";
         }
@@ -123,12 +156,18 @@ public class ExpressionTree {
         return value.toString();
     }
 
+    /**
+     * Convierte un objeto Document XML a una cadena de texto con formato.
+     *
+     * @param document Documento XML que se va a convertir.
+     * @return Cadena de texto con formato que representa el documento XML.
+     */
     private static String convertDocumentToString(Document document) {
         try {
             javax.xml.transform.TransformerFactory transformerFactory = javax.xml.transform.TransformerFactory.newInstance();
             javax.xml.transform.Transformer transformer = transformerFactory.newTransformer();
 
-            // Set up formatting options
+            // Configurar opciones de formato
             transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
@@ -137,31 +176,44 @@ public class ExpressionTree {
             return writer.toString();
         } catch (javax.xml.transform.TransformerException e) {
             e.printStackTrace();
-            return "Error converting Document to String: " + e.getMessage();
+            return "Error convirtiendo el Documento a Cadena de Texto: " + e.getMessage();
         }
     }
 
+    /**
+     * Realiza la verificación semántica de una expresión lógica.
+     *
+     * @param logicElement Elemento XML que representa la expresión lógica.
+     * @param typeCheck    Tipo esperado de la expresión lógica.
+     * @param symbols      Mapa de símbolos para verificar tipos de variables.
+     * @param manager      Gestor de la tabla de símbolos para funciones.
+     * @throws Exception   Excepción lanzada en caso de error semántico.
+     */
     private static void checkLogicExpr(Element logicElement, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
         if (typeCheck.equals("bool")) {
-            // Directly get "OP1" and "OP2" elements
+            // Obtener directamente los elementos "OP1" y "OP2"
             Element op1Element = (Element) logicElement.getElementsByTagName("OP1").item(0);
             Element op2Element = (Element) logicElement.getElementsByTagName("OP2").item(0);
 
+            // Verificar la expresión semántica de "OP1" y "OP2"
             checkSemanticExpr(op1Element, symbols, typeCheck, manager);
             checkSemanticExpr(op2Element, symbols, typeCheck, manager);
 
+            // Obtener los tipos de los hijos
             String childType1 = getChildTag(op1Element, symbols, manager);
             String childType2 = getChildTag(op2Element, symbols, manager);
 
+            // Patrón permitido para expresiones lógicas
             ArrayList<String> logicPattern = new ArrayList<>(Arrays.asList("REL", "LOGIC", "bool"));
 
+            // Verificar la estructura de la expresión lógica
             if (childType2 != null) {
                 if (!(logicPattern.contains(childType1) && logicPattern.contains(childType2))) {
-                    throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be LOGIC expressions.");
+                    throw new IllegalArgumentException("Estructura inválida: Ambos OP1 y OP2 deben ser expresiones LÓGICAS.");
                 }
             } else {
                 if (!(logicPattern.contains(childType1))) {
-                    throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be LOGIC expressions.");
+                    throw new IllegalArgumentException("Estructura inválida: Ambos OP1 y OP2 deben ser expresiones LÓGICAS.");
                 }
             }
 
@@ -170,21 +222,34 @@ public class ExpressionTree {
         }
     }
 
+    /**
+     * Realiza la verificación semántica de una expresión relacional.
+     *
+     * @param element   Elemento XML que representa la expresión relacional.
+     * @param typeCheck Tipo esperado de la expresión relacional.
+     * @param symbols   Mapa de símbolos para verificar tipos de variables.
+     * @param manager   Gestor de la tabla de símbolos para funciones.
+     * @throws Exception Excepción lanzada en caso de error semántico.
+     */
     private static void checkRelExpr(Element element, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
         if (typeCheck.equals("bool")) {
 
+            // Obtener elementos "OP1", "SYM" y "OP2"
             Element op1Element = (Element) element.getElementsByTagName("OP1").item(0);
             Element symElement = (Element) element.getElementsByTagName("SYM").item(0);
             Element op2Element = (Element) element.getElementsByTagName("OP2").item(0);
 
+            // Obtener los tipos de los hijos
             String childType1 = getChildTag(op1Element, symbols, manager);
             String symType = symElement.getTextContent();
             String childType2 = getChildTag(op2Element, symbols, manager);
 
+            // Patrones y operadores relacionales permitidos
             ArrayList<String> arithPattern = new ArrayList<>(Arrays.asList("ARITH", "int", "float"));
             ArrayList<String> arithRelOps = new ArrayList<>(Arrays.asList("l", "g", "le", "ge"));
             ArrayList<String> allRelOps = new ArrayList<>(Arrays.asList("eq", "ne"));
 
+            // Verificar la estructura de la expresión relacional
             if (arithRelOps.contains(symType) && arithPattern.contains(childType1) && arithPattern.contains(childType2)) {
                 if ((childType1.equals("int") || childType1.equals("float")) && childType2.equals("ARITH")) {
                     checkSemanticExpr(op1Element, symbols, childType1, manager);
@@ -194,7 +259,7 @@ public class ExpressionTree {
                     checkSemanticExpr(op1Element, symbols, childType1, manager);
                     checkSemanticExpr(op2Element, symbols, childType1, manager);
                 } else {
-                    throw new IllegalArgumentException("Invalid structure: BOOOOYAH");
+                    throw new IllegalArgumentException("Estructura inválida: BOOOOYAH");
                 }
             } else if (allRelOps.contains(symType)) {
                 if (childType1.equals("ARITH") && childType2.equals("ARITH")) {
@@ -213,38 +278,52 @@ public class ExpressionTree {
                     checkSemanticExpr(op1Element, symbols, childType1, manager);
                     checkSemanticExpr(op2Element, symbols, childType1, manager);
                 } else {
-                    throw new IllegalArgumentException("Invalid structure: BOOOOYAH");
+                    throw new IllegalArgumentException("Estructura inválida: BOOOOYAH");
                 }
             } else {
-                throw new IllegalArgumentException("Invalid structure: BOOOOYAH");
+                throw new IllegalArgumentException("Estructura inválida: BOOOOYAH");
             }
 
         } else {
-            throw new IllegalArgumentException("Invalid structure: BOOOOYAH");
+            throw new IllegalArgumentException("Estructura inválida: BOOOOYAH");
         }
     }
 
+    /**
+     * Realiza la verificación semántica de una expresión aritmética.
+     *
+     * @param element   Elemento XML que representa la expresión aritmética.
+     * @param typeCheck Tipo esperado de la expresión aritmética (int o float).
+     * @param symbols   Mapa de símbolos para verificar tipos de variables.
+     * @param manager   Gestor de la tabla de símbolos para funciones.
+     * @throws Exception Excepción lanzada en caso de error semántico.
+     */
     private static void checkArithExpr(Element element, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
         if ((typeCheck.equals("int") || typeCheck.equals("float"))) {
-            // Directly get "OP1" and "OP2" elements
+
+            // Obtener elementos "OP1" y "OP2"
             Element op1Element = (Element) element.getElementsByTagName("OP1").item(0);
             Element op2Element = (Element) element.getElementsByTagName("OP2").item(0);
 
+            // Realizar análisis semántico de los hijos
             checkSemanticExpr(op1Element, symbols, typeCheck, manager);
             checkSemanticExpr(op2Element, symbols, typeCheck, manager);
 
+            // Obtener los tipos de los hijos
             String childType1 = getChildTag(op1Element, symbols, manager);
             String childType2 = getChildTag(op2Element, symbols, manager);
 
+            // Patrón permitido para expresiones aritméticas
             ArrayList<String> logicPattern = new ArrayList<>(Arrays.asList("ARITH", "int", "float"));
 
+            // Verificar la estructura de la expresión aritmética
             if (childType2 != null){
                 if (!(logicPattern.contains(childType1) && logicPattern.contains(childType2))){
-                    throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be LOGIC expressions.");
+                    throw new IllegalArgumentException("Estructura inválida: Ambos OP1 y OP2 deben ser expresiones aritméticas.");
                 }
             } else {
                 if (!(logicPattern.contains(childType1))){
-                    throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be LOGIC expressions.");
+                    throw new IllegalArgumentException("Estructura inválida: Ambos OP1 y OP2 deben ser expresiones aritméticas.");
                 }
             }
 
@@ -253,71 +332,107 @@ public class ExpressionTree {
         }
     }
 
+
+    /**
+     * Realiza la verificación semántica de una expresión.
+     *
+     * @param element   Elemento XML que representa la expresión.
+     * @param symbols   Mapa de símbolos para verificar tipos de variables.
+     * @param typeCheck Tipo esperado de la expresión.
+     * @param manager   Gestor de la tabla de símbolos para funciones.
+     * @throws Exception Excepción lanzada en caso de error semántico.
+     */
     private static void checkSemanticExpr(Element element, Map<String, TabSymbol> symbols, String typeCheck, SymbolTableManager manager) throws Exception {
         if ((element != null) && (element.getFirstChild().getNodeType() == Node.ELEMENT_NODE)) {
+
+            // Obtener información del primer hijo
             String textContent = element.getFirstChild().getTextContent();
             String tagName = element.getFirstChild().getNodeName();
+
+            // Realizar acciones basadas en el tipo de elemento
             switch (tagName) {
                 case "ID" -> {
-                        if (!Semantic.idTypeCheck(symbols, textContent, typeCheck)) {
+                    // Verificar el tipo de la variable identificada
+                    if (!Semantic.idTypeCheck(symbols, textContent, typeCheck)) {
                         throw new IllegalArgumentException("Error Semántico en expresión: La variable \"" + textContent + "\" no es de tipo \"" + typeCheck + "\"");
                     }
                 }
                 case "CALL" -> {
+                    // Verificar el tipo de retorno de la función llamada
                     String funcName = element.getElementsByTagName("FUNC").item(0).getTextContent();
                     if(!Semantic.funcTypeCheck(funcName, manager, typeCheck)){
-                        throw new IllegalArgumentException("Error Semántico en expresión: La funcion \"" + funcName + "\" no retorna tipo \"" + typeCheck + "\"");
+                        throw new IllegalArgumentException("Error Semántico en expresión: La función \"" + funcName + "\" no retorna tipo \"" + typeCheck + "\"");
                     }
+                    // Procesar la llamada a la función
                     processCall(element, symbols, manager);
                 }
                 case "LITERAL" -> {
+                    // Verificar el tipo del literal
                     if (!Semantic.litTypeCheck(textContent, typeCheck)) {
                         throw new IllegalArgumentException("Error Semántico en expresión: El literal no es de tipo \"" + typeCheck + "\"");
                     }
                 }
                 case "ARR_ELEM" -> {
+                    // Procesar elemento de array
                     processArrElem(element, symbols, typeCheck, manager);
                 }
                 case "ARITH" -> {
+                    // Verificar expresión aritmética
                     checkArithExpr(element, typeCheck, symbols, manager);
                 }
                 case "REL" -> {
+                    // Verificar expresión relacional
                     checkRelExpr(element, typeCheck, symbols, manager);
                 }
                 case "LOGIC" -> {
+                    // Verificar expresión lógica
                     checkLogicExpr(element, typeCheck, symbols, manager);
                 }
             }
         }
     }
 
+    /**
+     * Obtiene la etiqueta del primer hijo del elemento padre y realiza acciones
+     * basadas en el tipo y contenido del hijo.
+     *
+     * @param parentElement Elemento padre del cual se obtendrá el primer hijo.
+     * @param symbols       Mapa de símbolos para verificar tipos de variables.
+     * @param manager       Gestor de la tabla de símbolos para funciones.
+     * @return Etiqueta del primer hijo o null si no hay hijo o la etiqueta no es reconocida.
+     */
     private static String getChildTag(Element parentElement, Map<String, TabSymbol> symbols, SymbolTableManager manager) {
         if (parentElement != null) {
             Node child = parentElement.getFirstChild();
 
-            // Check the first child node and perform actions based on its type and content
+            // Verificar el primer nodo hijo y realizar acciones basadas en su tipo y contenido
             if (child != null && child.getNodeType() == Node.ELEMENT_NODE) {
                 String childTagName = child.getNodeName();
-                System.out.println("Element Node: " + childTagName);
+                System.out.println("Elemento Nodo: " + childTagName);
 
+                // Realizar acciones específicas para ciertas etiquetas
                 if (childTagName.equals("LOGIC") || childTagName.equals("REL") || childTagName.equals("ARITH")) {
                     return childTagName;
                 } else {
                     String childVal;
                     switch (childTagName) {
                         case "ID" -> {
+                            // Si es una ID, devolver el tipo de la variable
                             childVal = child.getTextContent();
                             return symbols.get(childVal).getType();
                         }
                         case "LITERAL" -> {
+                            // Si es un literal, devolver el tipo del literal
                             childVal = child.getTextContent();
                             return Utils.splitMessage(childVal, "=").get(0);
                         }
                         case "CALL" -> {
+                            // Si es una llamada a función, devolver el tipo de retorno de la función
                             childVal = child.getFirstChild().getTextContent();
                             return manager.getSymbolTable(childVal).getReturnType();
                         }
                         case "ARR_ELEM" -> {
+                            // Si es un elemento de array, devolver el tipo de la variable de array
                             childVal = child.getFirstChild().getTextContent();
                             return symbols.get(childVal).getType();
                         }
@@ -328,33 +443,41 @@ public class ExpressionTree {
         return null;
     }
 
+    /**
+     * Procesa una llamada a función (CALL) y verifica la validez de los argumentos según los
+     * tipos esperados por la función.
+     *
+     * @param callNode  Nodo que representa la llamada a función.
+     * @param symbols   Mapa de símbolos para verificar tipos de variables.
+     * @param manager   Gestor de la tabla de símbolos para funciones.
+     * @throws Exception Si hay errores semánticos en la llamada a función.
+     */
     private static void processCall(Node callNode, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
-        //TODO ACTUALIZAR SWITCH
         if (callNode.getNodeType() == Node.ELEMENT_NODE) {
             Element callElement = (Element) callNode;
             NodeList funcElement = callElement.getElementsByTagName("FUNC");
             String funcName = funcElement.item(0).getTextContent();
 
-            // Find the first ARGUMENTS tag within the CALL tag
+            // Encontrar el primer tag ARGUMENTS dentro del tag CALL
             NodeList argumentsList = callElement.getElementsByTagName("ARGUMENTS");
 
             if (argumentsList.getLength() > 0) {
                 Element argumentsElement = (Element) argumentsList.item(0);
 
-                // Find direct child ARG nodes within ARGUMENTS
+                // Encontrar nodos ARG hijos directos dentro de ARGUMENTS
                 NodeList argList = argumentsElement.getChildNodes();
 
-                // Process each direct child ARG tag
+                // Procesar cada nodo ARG hijo directo
                 for (int i = 0; i < argList.getLength(); i++) {
                     Node argNode = argList.item(i);
 
                     if (argNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element argElement = (Element) argNode;
 
-                        // Determine the type of the ARG tag
+                        // Determinar el tipo del tag ARG
                         String argType = argElement.getFirstChild().getNodeName();
 
-                        // Perform action based on the type of ARG tag
+                        // Realizar acción basada en el tipo del tag ARG
 
                         String op, type, typeCheck;
                         SymbolTable function = manager.getSymbolTable(funcName);
@@ -367,19 +490,19 @@ public class ExpressionTree {
                                 op = argElement.getTextContent().trim();
                                 type = symbols.get(op).getType();
                                 if (!type.equals(typeCheck)) {
-                                    throw new IllegalArgumentException("NOT ID USABLE");
+                                    throw new IllegalArgumentException("ID no utilizable");
                                 }
                             }
                             case "LITERAL" -> {
-                                // TODO: GET THE TYPE AND COMPARE
+                                // TODO: OBTENER EL TIPO Y COMPARAR
                                 op = argElement.getTextContent().trim();
                                 type = Utils.splitMessage(op, "=").get(0);
                                 if (!type.equals(typeCheck)) {
-                                    throw new IllegalArgumentException("NOT LITERAL USABLE");
+                                    throw new IllegalArgumentException("Literal no utilizable");
                                 }
                             }
                             case "CALL" -> {
-                                // Recursively process ARG tags within the CALL tag
+                                // Procesar de forma recursiva los tags ARG dentro del tag CALL
                                 processCall(argElement, symbols, manager);
                             }
                             case "ARITH" -> {
@@ -391,7 +514,7 @@ public class ExpressionTree {
                             case "LOGIC" -> {
                                 checkLogicExpr(argElement, typeCheck, symbols, manager);
                             }
-                            default -> System.out.println("Unknown type: " + argType);
+                            default -> System.out.println("Tipo desconocido: " + argType);
                         }
                     }
                 }
@@ -399,6 +522,15 @@ public class ExpressionTree {
         }
     }
 
+    /**
+     * Procesa una expresión (EXPR) y verifica la validez semántica según el tipo esperado.
+     *
+     * @param exprElement Elemento que representa la expresión.
+     * @param typeCheck   Tipo esperado para la expresión.
+     * @param symbols     Mapa de símbolos para verificar tipos de variables.
+     * @param manager     Gestor de la tabla de símbolos para funciones.
+     * @throws Exception  Si hay errores semánticos en la expresión.
+     */
     private static void processExpr(Element exprElement, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
         Node childNode = exprElement.getFirstChild();
 
@@ -434,11 +566,20 @@ public class ExpressionTree {
                 case "ARR_ELEM" -> {
                     processArrElem(childElement, symbols, typeCheck, manager);
                 }
-                default -> throw new IllegalArgumentException("Unsupported tag within EXPR: " + childTagName);
+                default -> throw new IllegalArgumentException("Tag no soportado dentro de EXPR: " + childTagName);
             }
         }
     }
 
+    /**
+     * Procesa un elemento de arreglo (ARRAY) verificando la validez semántica de cada expresión.
+     *
+     * @param arrayElement Elemento que representa el arreglo.
+     * @param typeCheck    Tipo esperado para las expresiones dentro del arreglo.
+     * @param symbols      Mapa de símbolos para verificar tipos de variables.
+     * @param manager      Gestor de la tabla de símbolos para funciones.
+     * @throws Exception   Si hay errores semánticos en alguna de las expresiones del arreglo.
+     */
     private static void processArray(Element arrayElement, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
         NodeList exprNodes = arrayElement.getElementsByTagName("EXPR");
 
@@ -451,22 +592,30 @@ public class ExpressionTree {
         }
     }
 
+    /**
+     * Procesa un elemento de arreglo (ARR_ELEM), realizando análisis semántico en la etiqueta ID y EXPR.
+     *
+     * @param arrElemElement Elemento que representa un elemento de arreglo.
+     * @param symbols       Mapa de símbolos para verificar tipos de variables.
+     * @param typeCheck     Tipo esperado para el elemento de arreglo.
+     * @param manager       Gestor de la tabla de símbolos para funciones.
+     * @throws Exception    Si hay errores semánticos en la etiqueta ID o EXPR del elemento de arreglo.
+     */
     private static void processArrElem(Element arrElemElement, Map<String, TabSymbol> symbols, String typeCheck, SymbolTableManager manager) throws Exception {
-        // Process the <ID> tag
+        // Procesa la etiqueta <ID>
         Element idElement = (Element) arrElemElement.getElementsByTagName("ID").item(0);
         String idText = idElement.getTextContent();
 
-        // Check semantic analysis for the <ID> tag
+        // Verifica el análisis semántico para la etiqueta <ID>
         if (!Semantic.idTypeCheck(symbols, idText, typeCheck)) {
             throw new IllegalArgumentException("Error Semántico: La variable \"" + idText + "\" no es de tipo \"" + typeCheck + "\"");
         }
 
-        // Process the <EXPR> tag
+        // Procesa la etiqueta <EXPR>
         Element exprElement = (Element) arrElemElement.getElementsByTagName("EXPR").item(0);
 
-        // Check semantic analysis for the <EXPR> tag
+        // Verifica el análisis semántico para la etiqueta <EXPR>
         checkSemanticExpr(exprElement, symbols, typeCheck, manager);
-
     }
 }
 
