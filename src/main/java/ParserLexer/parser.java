@@ -684,7 +684,8 @@ class CUP$parser$actions {
 		
                          paramCount = 1;
                          RESULT = "function::" + (String)id + "::" + (String)block;
-                         System.out.println(RESULT);
+                         symList = Utils.splitMessage((String)RESULT, "::");
+                         BlockTree.processFuncBlock(symList.get(3), symList.get(2), symList.get(1), symbols, symTabMgr);
                          Utils.splitAddFunc((String)RESULT, symbols, symTabMgr, new ArrayList<String>(parameters));
                          parameters.clear();
               CUP$parser$result = parser.getSymbolFactory().newSymbol("func_decl",4, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1057,7 +1058,7 @@ ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symT
           case 33: // stmt ::= init_stmt 
             {
               Object RESULT =null;
-
+		 RESULT = "<INIT></INIT>";
               CUP$parser$result = parser.getSymbolFactory().newSymbol("stmt",12, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1066,7 +1067,7 @@ ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symT
           case 34: // stmt ::= expr_stmt 
             {
               Object RESULT =null;
-
+		 RESULT = "<EXPR_S><EXPR_S>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("stmt",12, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1075,7 +1076,14 @@ ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symT
           case 35: // stmt ::= assg_stmt 
             {
               Object RESULT =null;
-
+		int assgleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int assgright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object assg = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		
+       RESULT = "<ASSG>" + (String)assg + "</ASSG>";
+       System.out.println(RESULT);
+       BlockTree.processAssign((String)RESULT, symbols, symTabMgr);
+       
               CUP$parser$result = parser.getSymbolFactory().newSymbol("stmt",12, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1084,7 +1092,7 @@ ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symT
           case 36: // stmt ::= ctrl_struct_stmt 
             {
               Object RESULT =null;
-
+		 RESULT = "<CTRL></CTRL>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("stmt",12, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1093,7 +1101,7 @@ ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symT
           case 37: // stmt ::= input_output_stmt 
             {
               Object RESULT =null;
-
+		 RESULT = "<IO></IO>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("stmt",12, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1105,7 +1113,7 @@ ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symT
 		int rtrnleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int rtrnright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object rtrn = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = (String)rtrn; 
+		 RESULT = "<RETURN>" + (String)rtrn + "</RETURN>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("stmt",12, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1114,7 +1122,10 @@ ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symT
           case 39: // stmt ::= break_stmt 
             {
               Object RESULT =null;
-
+		int brkleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int brkright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object brk = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT = "<BREAK></BREAK>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("stmt",12, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1129,7 +1140,7 @@ ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symT
 		int stmt_lleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int stmt_lright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object stmt_l = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT =  (String)stmt_l; 
+		 RESULT = (String)stmt + (String)stmt_l ; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("stmt_list",20, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1174,10 +1185,7 @@ ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symT
 		int exprleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int exprright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object expr = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		
-RESULT = "<ASSG>" + (String)mut + (String)expr + "</ASSG>";
-System.out.println(RESULT);
-
+		RESULT = (String)mut + "<EXPR>" + (String)expr + "</EXPR>";
               CUP$parser$result = parser.getSymbolFactory().newSymbol("assg_stmt",15, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1345,7 +1353,7 @@ System.out.println(RESULT);
 		int expr_stmtleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int expr_stmtright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object expr_stmt = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = "<STMT><RETURN>" + (String)expr_stmt + "</RETURN></STMT>" ; 
+		 RESULT = (String)expr_stmt; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("return_stmt",18, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;

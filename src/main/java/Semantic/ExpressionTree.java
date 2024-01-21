@@ -39,7 +39,7 @@ public class ExpressionTree {
         String rootTagName = rootElement.getTagName();
 
         // Imprimir información sobre el documento XML analizado
-        System.out.println("Documento XML analizado:\n" + convertDocumentToString(document));
+        //System.out.println("Documento XML analizado:\n" + convertDocumentToString(document));
 
         // Realizar la verificación semántica según la etiqueta raíz de la expresión
         if ("ARRAY".equals(rootTagName) && ((typeCheck.equals("int") || typeCheck.equals("char")))) {
@@ -53,18 +53,18 @@ public class ExpressionTree {
             switch (rootTagName) {
                 case "LITERAL" -> {
                     if (!Semantic.litTypeCheck(rootText, typeCheck)) {
-                        throw new IllegalArgumentException("Error Semántico: El literal no es de tipo \"" + typeCheck + "\"");
+                        System.out.println(Utils.ANSI_RED + "Error Semántico: El literal no es de tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                     }
                 }
                 case "ID" -> {
                     if (!Semantic.idTypeCheck(symbols, rootText, typeCheck)) {
-                        throw new IllegalArgumentException("Error Semántico: La variable \"" + rootText + "\" no es de tipo \"" + typeCheck + "\"");
+                        System.out.println(Utils.ANSI_RED + "Error Semántico: La variable \"" + rootText + "\" no es de tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                     }
                 }
                 case "CALL" -> {
                     String funcName = rootElement.getElementsByTagName("FUNC").item(0).getTextContent();
                     if (!Semantic.funcTypeCheck(funcName, manager, typeCheck)) {
-                        throw new IllegalArgumentException("Error Semántico en expresión aritmética: La función \"" + funcName + "\" retorna tipo \"" + typeCheck + "\"");
+                        System.out.println(Utils.ANSI_RED + "Error Semántico en expresión aritmética: La función \"" + funcName + "\" retorna tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                     }
                     processCall(rootElement, symbols, manager);
                 }
@@ -162,7 +162,7 @@ public class ExpressionTree {
      * @param document Documento XML que se va a convertir.
      * @return Cadena de texto con formato que representa el documento XML.
      */
-    private static String convertDocumentToString(Document document) {
+    public static String convertDocumentToString(Document document) {
         try {
             javax.xml.transform.TransformerFactory transformerFactory = javax.xml.transform.TransformerFactory.newInstance();
             javax.xml.transform.Transformer transformer = transformerFactory.newTransformer();
@@ -209,16 +209,16 @@ public class ExpressionTree {
             // Verificar la estructura de la expresión lógica
             if (childType2 != null) {
                 if (!(logicPattern.contains(childType1) && logicPattern.contains(childType2))) {
-                    throw new IllegalArgumentException("Estructura inválida: Ambos OP1 y OP2 deben ser expresiones LÓGICAS.");
+                    System.out.println(Utils.ANSI_RED + "Error Semántico: Estructura inválida: Ambos OP1 y OP2 deben ser expresiones LÓGICAS o RELACIONALES." + Utils.ANSI_RESET);
                 }
             } else {
                 if (!(logicPattern.contains(childType1))) {
-                    throw new IllegalArgumentException("Estructura inválida: Ambos OP1 y OP2 deben ser expresiones LÓGICAS.");
+                    System.out.println(Utils.ANSI_RED + "Error Semántico: Estructura inválida: Ambos OP1 y OP2 deben ser expresiones LÓGICAS o RELACIONALES." + Utils.ANSI_RESET);
                 }
             }
 
         } else {
-            throw new IllegalArgumentException("Error Semántico: La expresión no es booleana");
+            System.out.println(Utils.ANSI_RED + "Error Semántico: La expresión no es booleana" + Utils.ANSI_RESET);
         }
     }
 
@@ -259,7 +259,7 @@ public class ExpressionTree {
                     checkSemanticExpr(op1Element, symbols, childType1, manager);
                     checkSemanticExpr(op2Element, symbols, childType1, manager);
                 } else {
-                    throw new IllegalArgumentException("Estructura inválida: BOOOOYAH");
+                    System.out.println(Utils.ANSI_RED + "Error Semántico: Estructura inválida: Las expresiones relacionales de tipo <, >, <=, >= deben ser ARITMÉTICAS." + Utils.ANSI_RESET);
                 }
             } else if (allRelOps.contains(symType)) {
                 if (childType1.equals("ARITH") && childType2.equals("ARITH")) {
@@ -278,14 +278,14 @@ public class ExpressionTree {
                     checkSemanticExpr(op1Element, symbols, childType1, manager);
                     checkSemanticExpr(op2Element, symbols, childType1, manager);
                 } else {
-                    throw new IllegalArgumentException("Estructura inválida: BOOOOYAH");
+                    System.out.println(Utils.ANSI_RED + "Error Semántico: Estructura inválida: Las expresiones relacionales de tipo == o != deben ser del mismo tipo de expresión." + Utils.ANSI_RESET);
                 }
             } else {
-                throw new IllegalArgumentException("Estructura inválida: BOOOOYAH");
+                System.out.println(Utils.ANSI_RED + "Error Semántico: Estructura inválida: La expresión relacional no es válida" + Utils.ANSI_RESET);
             }
 
         } else {
-            throw new IllegalArgumentException("Estructura inválida: BOOOOYAH");
+            System.out.println(Utils.ANSI_RED + "Error Semántico: La expresión no es booleana" + Utils.ANSI_RESET);
         }
     }
 
@@ -319,16 +319,16 @@ public class ExpressionTree {
             // Verificar la estructura de la expresión aritmética
             if (childType2 != null){
                 if (!(logicPattern.contains(childType1) && logicPattern.contains(childType2))){
-                    throw new IllegalArgumentException("Estructura inválida: Ambos OP1 y OP2 deben ser expresiones aritméticas.");
+                    System.out.println(Utils.ANSI_RED + "Error Semántico: Estructura inválida: Ambos OP1 y OP2 deben ser expresiones aritméticas." + Utils.ANSI_RESET);
                 }
             } else {
                 if (!(logicPattern.contains(childType1))){
-                    throw new IllegalArgumentException("Estructura inválida: Ambos OP1 y OP2 deben ser expresiones aritméticas.");
+                    System.out.println(Utils.ANSI_RED + "Error Semántico: Estructura inválida: Ambos OP1 y OP2 deben ser expresiones aritméticas." + Utils.ANSI_RESET);
                 }
             }
 
         } else {
-            throw new IllegalArgumentException("Error Semántico: La expresión no es aritmética.");
+            System.out.println(Utils.ANSI_RED + "Error Semántico: La expresión no es aritmética." + Utils.ANSI_RESET);
         }
     }
 
@@ -342,7 +342,7 @@ public class ExpressionTree {
      * @param manager   Gestor de la tabla de símbolos para funciones.
      * @throws Exception Excepción lanzada en caso de error semántico.
      */
-    private static void checkSemanticExpr(Element element, Map<String, TabSymbol> symbols, String typeCheck, SymbolTableManager manager) throws Exception {
+    public static void checkSemanticExpr(Element element, Map<String, TabSymbol> symbols, String typeCheck, SymbolTableManager manager) throws Exception {
         if ((element != null) && (element.getFirstChild().getNodeType() == Node.ELEMENT_NODE)) {
 
             // Obtener información del primer hijo
@@ -354,14 +354,14 @@ public class ExpressionTree {
                 case "ID" -> {
                     // Verificar el tipo de la variable identificada
                     if (!Semantic.idTypeCheck(symbols, textContent, typeCheck)) {
-                        throw new IllegalArgumentException("Error Semántico en expresión: La variable \"" + textContent + "\" no es de tipo \"" + typeCheck + "\"");
+                        System.out.println(Utils.ANSI_RED + "Error Semántico en expresión: La variable \"" + textContent + "\" no es de tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                     }
                 }
                 case "CALL" -> {
                     // Verificar el tipo de retorno de la función llamada
                     String funcName = element.getElementsByTagName("FUNC").item(0).getTextContent();
                     if(!Semantic.funcTypeCheck(funcName, manager, typeCheck)){
-                        throw new IllegalArgumentException("Error Semántico en expresión: La función \"" + funcName + "\" no retorna tipo \"" + typeCheck + "\"");
+                        System.out.println(Utils.ANSI_RED + "Error Semántico en expresión: La función \"" + funcName + "\" no retorna tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                     }
                     // Procesar la llamada a la función
                     processCall(element, symbols, manager);
@@ -369,7 +369,7 @@ public class ExpressionTree {
                 case "LITERAL" -> {
                     // Verificar el tipo del literal
                     if (!Semantic.litTypeCheck(textContent, typeCheck)) {
-                        throw new IllegalArgumentException("Error Semántico en expresión: El literal no es de tipo \"" + typeCheck + "\"");
+                        System.out.println(Utils.ANSI_RED + "Error Semántico en expresión: El literal no es de tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                     }
                 }
                 case "ARR_ELEM" -> {
@@ -401,7 +401,7 @@ public class ExpressionTree {
      * @param manager       Gestor de la tabla de símbolos para funciones.
      * @return Etiqueta del primer hijo o null si no hay hijo o la etiqueta no es reconocida.
      */
-    private static String getChildTag(Element parentElement, Map<String, TabSymbol> symbols, SymbolTableManager manager) {
+    static String getChildTag(Element parentElement, Map<String, TabSymbol> symbols, SymbolTableManager manager) {
         if (parentElement != null) {
             Node child = parentElement.getFirstChild();
 
@@ -490,7 +490,7 @@ public class ExpressionTree {
                                 op = argElement.getTextContent().trim();
                                 type = symbols.get(op).getType();
                                 if (!type.equals(typeCheck)) {
-                                    throw new IllegalArgumentException("ID no utilizable");
+                                    System.out.println(Utils.ANSI_RED + "Error Semántico en llamada a función: La variable \"" + op + "\" no es de tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                                 }
                             }
                             case "LITERAL" -> {
@@ -498,7 +498,7 @@ public class ExpressionTree {
                                 op = argElement.getTextContent().trim();
                                 type = Utils.splitMessage(op, "=").get(0);
                                 if (!type.equals(typeCheck)) {
-                                    throw new IllegalArgumentException("Literal no utilizable");
+                                    System.out.println(Utils.ANSI_RED + "Error Semántico en llamada a función: El literal no es de tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                                 }
                             }
                             case "CALL" -> {
@@ -545,13 +545,13 @@ public class ExpressionTree {
                 case "ID" -> {
                     String id = childElement.getTextContent();
                     if (!Semantic.idTypeCheck(symbols, id, typeCheck)) {
-                        throw new IllegalArgumentException("Error Semántico en expresión: La variable \"" + id + "\" no es de tipo \"" + typeCheck + "\"");
+                        System.out.println(Utils.ANSI_RED + "Error Semántico en expresión: La variable \"" + id + "\" no es de tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                     }
                 }
                 case "LITERAL" -> {
                     String literal = childElement.getTextContent();
                     if (!Semantic.litTypeCheck(literal, typeCheck)) {
-                        throw new IllegalArgumentException("Error Semántico en expresión: El literal no es de tipo \"" + typeCheck + "\"");
+                        System.out.println(Utils.ANSI_RED + "Error Semántico en expresión: El literal no es de tipo \"" + typeCheck + "\"" + Utils.ANSI_RESET);
                     }
                 }
                 case "CALL" -> {
@@ -569,7 +569,7 @@ public class ExpressionTree {
                 case "ARR_ELEM" -> {
                     processArrElem(childElement, symbols, typeCheck, manager);
                 }
-                default -> throw new IllegalArgumentException("Tag no soportado dentro de EXPR: " + childTagName);
+                default -> System.out.println(Utils.ANSI_RED + "Tag no soportado dentro de EXPR: " + childTagName + Utils.ANSI_RESET);
             }
         }
     }
@@ -611,7 +611,7 @@ public class ExpressionTree {
 
         // Verifica el análisis semántico para la etiqueta <ID>
         if (!Semantic.idTypeCheck(symbols, idText, typeCheck)) {
-            throw new IllegalArgumentException("Error Semántico: La variable \"" + idText + "\" no es de tipo \"" + typeCheck + "\"");
+            System.out.println(Utils.ANSI_RED + "Error Semántico: La variable \"" + idText + "\" no es de tipo \"" + typeCheck + "\"");
         }
 
         // Procesa la etiqueta <EXPR>

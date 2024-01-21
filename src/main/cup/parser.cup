@@ -82,214 +82,214 @@ terminal LOCAL;
 terminal FUNCTION;
 
 // No terminales
-nonterminal navidad; //Inicial
+nonterminal navidad; // No terminal inicial
 nonterminal block; // Bloque de código
-nonterminal type, arr_type; //Tipos y tipos de arreglo
+nonterminal type, arr_type; // Tipos y tipos de arreglo
 nonterminal func_decl, func_decl_list, var_decl, arr_decl; // Declaraciones
 nonterminal param_list, param; // Parámetros
 nonterminal var_decl_init, arr_decl_init; // Variables y arreglos inicializados
-nonterminal stmt, init_stmt, expr_stmt, assg_stmt, ctrl_struct_stmt, input_output_stmt, return_stmt, break_stmt; // Declaraciones
-nonterminal stmt_list; //Lista de declaraciones
+nonterminal stmt, init_stmt, expr_stmt, assg_stmt, ctrl_struct_stmt, input_output_stmt, return_stmt, break_stmt; // Sentencias
+nonterminal stmt_list; // Lista de sentencias
 nonterminal conditional_stmt, iter_stmt; // Estructuras de control
-nonterminal elif_else;
-nonterminal do_until_loop, for_loop;
-nonterminal read_stmt, write_stmt;
+nonterminal elif_else; // Alternativa (else if / else)
+nonterminal do_until_loop, for_loop; // Ciclos
+nonterminal read_stmt, write_stmt; // Sentencias de entrada y salida
 nonterminal expr, expr_list; // Expresiones
-nonterminal and_expr, not_expr, rel_expr, rel_op;
-nonterminal add_sub_expr, add_sub_ops;
-nonterminal mul_div_expr, mul_div_ops;
-nonterminal exp_expr;
-nonterminal un_arith_expr, un_arith_ops;
-nonterminal factor;
+nonterminal and_expr, not_expr, rel_expr, rel_op; // Expresiones booleanas y relaciones
+nonterminal add_sub_expr, add_sub_ops; // Suma y resta
+nonterminal mul_div_expr, mul_div_ops; // Multiplicación y división
+nonterminal exp_expr; // Exponente
+nonterminal un_arith_expr, un_arith_ops; // Operadores unarios
+nonterminal factor; // Factor en una expresión
 nonterminal mutable, immutable; // Mutable o inmutable
 nonterminal call; // Llamada a función
 nonterminal args, arg_list; // Argumentos
 nonterminal literal; // Literales
-nonterminal gen_id, arr_id, identifier, var_init, arr_init;
-start with navidad;
+nonterminal gen_id, arr_id, identifier, var_init, arr_init; // Identificadores y inicializadores
+start with navidad; // No terminal de inicio
 
 /**********************************************************************************************************************/
-
+// Simbolo inicial
 navidad ::= func_decl_list {: symTabMgr.printAllTables(); :};
-
+// Producciones para lista de declaraciones de funciones (func_decl_list)
 func_decl_list ::= func_decl
                  | func_decl func_decl_list {: :};
-
+// Producción para declaración de una función (func_decl)
 func_decl ::= FUNCTION identifier:id ABRECUENTO param_list CIERRACUENTO block:block {:
                          paramCount = 1;
                          RESULT = "function::" + (String)id + "::" + (String)block;
-                         System.out.println(RESULT);
+                         symList = Utils.splitMessage((String)RESULT, "::");
+                         BlockTree.processFuncBlock(symList.get(3), symList.get(2), symList.get(1), symbols, symTabMgr);
                          Utils.splitAddFunc((String)RESULT, symbols, symTabMgr, new ArrayList<String>(parameters));
                          parameters.clear();:};
-
+// Producciones para identificador (identifier)
 identifier ::= gen_id:id {: RESULT = (String)id; :}
              | arr_id:id {: RESULT = (String)id; :};
-
+// Producciones para tipo de dato (type)
 type ::= FATHERCHRISTMAS: t_int {: RESULT = (String)t_int; :}
        | KRISKRINGLE: t_flt {: RESULT = (String)t_flt; :}
        | SANTACLAUS: t_char {: RESULT = (String)t_char; :}
        | DEDMOROZ: t_str {: RESULT = (String)t_str; :}
        | SANNICOLAS: t_bool {: RESULT = (String)t_bool; :};
-
+// Producción para identificador generalizado (gen_id)
 gen_id ::= type:tp PERSONA:id {: RESULT = (String)tp + "::" + (String)id; :};
-
+// Producción para identificador de arreglo (arr_id)
 arr_id ::= gen_id:id ABREEMPAQUE CIERRAEMPAQUE {: RESULT = (String)id + "::UND" ;  :}
          | gen_id:id ABREEMPAQUE expr:size CIERRAEMPAQUE {: RESULT = (String)id + "::" + (String)size; :};
-
+// Producciones para lista de parámetros (param_list)
 param_list ::= param:par {: RESULT = (String)par; :}
              | param:par PINO param_list:par_l {: RESULT = (String)par + ", " + (String)par_l; :}
              | {: RESULT = ""; :};
-
+// Producción para parámetro (param)
 param ::= identifier:id {: RESULT = "parameter::" + (String)id + "::" + paramCount;
                            paramCount++;
                            ArrayList<String> params = Utils.splitMessage((String)RESULT,"::");
                            parameters.add(params.get(1));
                            Utils.splitAddSym((String)RESULT, symbols); :};
-
+// Producción para bloque de código (block)
 block ::= ABREREGALO stmt_list:stmt_l CIERRAREGALO {: RESULT = "<BLOCK>" + (String)stmt_l + "</BLOCK>"; :}
         | error;
-
+// Producción para inicialización de variable (init_stmt)
 init_stmt ::= var_decl_init:var FINREGALO {: RESULT = "variable::" + (String)var;
                                              Utils.splitAddSym((String)RESULT, symbols); :}
             | arr_decl_init:arr FINREGALO {: RESULT = "array::" + (String)arr;
                                              Utils.splitAddSym((String)RESULT, symbols); :};
-
+// Producciones para inicialización de variable (var_decl_init)
 var_decl_init ::= var_init:var {: RESULT = (String)var; :}
                 | var_decl:var {: RESULT = (String)var; :};
-
+// Producción para inicialización de variable (var_init)
 var_init ::= var_decl:var ENTREGA expr:expr {:
 RESULT = (String)var + "::" + (String)expr;
 symList = Utils.splitMessage((String)RESULT, "::");
 ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTabMgr);
 :};
-
+// Producción para declaración de variable local (var_decl)
 var_decl ::= LOCAL gen_id:id {: RESULT = (String)id; :};
-
+// Producciones para inicialización/declaración de arreglo (arr_decl_init)
 arr_decl_init ::= arr_init:arr {: RESULT = (String)arr; :}
                 | arr_decl:arr {: RESULT = (String)arr; :};
-
+// Producción para inicialización de arreglo (arr_init)
 arr_init ::= arr_decl:id ENTREGA ABREEMPAQUE expr_list:expr_l CIERRAEMPAQUE {:
 RESULT = (String)id + "::<ARRAY>" +(String)expr_l + "</ARRAY>";
 symList = Utils.splitMessage((String)RESULT, "::");
 ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symTabMgr);
 :};
-
+// Producción para declaración de arreglo local (arr_decl)
 arr_decl ::= LOCAL arr_id:id {: RESULT = (String)id; :};
-
+// Producción para lista de expresiones (expr_list)
 expr_list ::= expr:expr {: RESULT = "<EXPR>" + (String)expr + "</EXPR>";:}
             | expr:expr PINO expr_list:expr_l {: RESULT = "<EXPR>" + (String)expr + "</EXPR>" + (String)expr_l;:};
-
 /**********************************************************************************************************************/
-
-stmt ::= init_stmt
-       | expr_stmt
-       | assg_stmt
-       | ctrl_struct_stmt
-       | input_output_stmt
-       | return_stmt:rtrn {: RESULT = (String)rtrn; :}
-       | break_stmt;
-
-stmt_list ::= stmt:stmt stmt_list:stmt_l {: RESULT =  (String)stmt_l; :}
+// Producciones para las sentencias (stmt)
+stmt ::= init_stmt {: RESULT = "<INIT></INIT>";:}
+       | expr_stmt {: RESULT = "<EXPR_S><EXPR_S>"; :}
+       | assg_stmt:assg {:
+       RESULT = "<ASSG>" + (String)assg + "</ASSG>";
+       System.out.println(RESULT);
+       BlockTree.processAssign((String)RESULT, symbols, symTabMgr);
+       :}
+       | ctrl_struct_stmt {: RESULT = "<CTRL></CTRL>"; :}
+       | input_output_stmt {: RESULT = "<IO></IO>"; :}
+       | return_stmt:rtrn {: RESULT = "<RETURN>" + (String)rtrn + "</RETURN>"; :}
+       | break_stmt:brk {:RESULT = "<BREAK></BREAK>"; :};
+// Producciones para listas de sentencias (stmt_list)
+stmt_list ::= stmt:stmt stmt_list:stmt_l {: RESULT = (String)stmt + (String)stmt_l ; :}
             | ;
-
+// Producción para las sentencias de expresiones (expr_stmt)
 expr_stmt ::= expr:expr FINREGALO {: RESULT = (String)expr; :}
             | FINREGALO;
-
-assg_stmt ::= mutable:mut ENTREGA expr:expr FINREGALO {:
-RESULT = "<ASSG>" + (String)mut + (String)expr + "</ASSG>";
-System.out.println(RESULT);
-:};
-
+// Producción para las sentencias de asignación (assg_stmt)
+assg_stmt ::= mutable:mut ENTREGA expr:expr FINREGALO {:RESULT = (String)mut + "<EXPR>" + (String)expr + "</EXPR>";:};
+// Producción para las estructuras de control (ctrl_struct_stmt)
 ctrl_struct_stmt ::= conditional_stmt
                    | iter_stmt;
-
+// Producción para las sentencias condicionales (conditional_stmt)
 conditional_stmt ::= ELFO ABRECUENTO expr CIERRACUENTO block elif_else;
-
+// Producción para las cláusulas elif y else (elif_else)
 elif_else ::= HADA ABRECUENTO expr CIERRACUENTO block elif_else
             | DUENDE block
             | ;
-
+// Producción para las instrucciones de iteración (iter_stmt)
 iter_stmt ::= do_until_loop
             | for_loop;
-
+// Producción para las sentencias de bucle do-until (do_until_loop)
 do_until_loop ::= HACE block REVISA ABRECUENTO expr CIERRACUENTO FINREGALO;
-
+// Producción para las sentencias de bucle for (for_loop)
 for_loop ::= ENVUELVE ABRECUENTO var_init FINREGALO expr FINREGALO expr CIERRACUENTO block
            | ENVUELVE ABRECUENTO assg_stmt expr FINREGALO expr CIERRACUENTO block;
-
+// Producción para las sentencias de entrada y salida (input_output_stmt)
 input_output_stmt ::= read_stmt:stmt FINREGALO {: RESULT = stmt; :}
                     | write_stmt:stmt FINREGALO {: RESULT = stmt; :};
-
+// Producción para las sentencias de escritura (write_stmt)
 write_stmt ::= ESCUCHA:wrt ABRECUENTO PERSONA:id CIERRACUENTO {: RESULT = (String)wrt + "(" + (String)id + ")"; :};
-
+// Producción para las sentencias de lectura (read_stmt)
 read_stmt ::= NARRA:prnt ABRECUENTO expr:expr CIERRACUENTO {: RESULT = (String)prnt + "(" + (String)expr + ")"; :};
-
-return_stmt ::= ENVIA:rtrn expr_stmt:expr_stmt {: RESULT = "<STMT><RETURN>" + (String)expr_stmt + "</RETURN></STMT>" ; :};
-
+// Producción para las sentencias de retorno (return_stmt)
+return_stmt ::= ENVIA:rtrn expr_stmt:expr_stmt {: RESULT = (String)expr_stmt; :};
+// Producción para las sentencias de ruptura (break_stmt)
 break_stmt ::= CORTA:brk FINREGALO {: RESULT = (String)brk; :};
-
+// Producción para expresiones lógicas (expr)
 expr ::= and_expr:an_expr GASPAR:sym expr:expr {: RESULT = "<LOGIC><OP1>" + (String)an_expr + "</OP1><SYM>" +(String)sym + "</SYM><OP2>" + (String)expr + "</OP2></LOGIC>";  :}
        | and_expr:an_expr {: RESULT = (String)an_expr ;  :};
-
+// Producción para expresiones lógicas AND (and_expr)
 and_expr ::= not_expr:no_expr MELCHOR:sym and_expr:an_expr {: RESULT = "<LOGIC><OP1>" + (String)no_expr + "</OP1><SYM>"+ (String)sym + "</SYM><OP2>" + (String)an_expr + "</OP2></LOGIC>"; :}
            | not_expr:no_expr {: RESULT = (String)no_expr; :};
-
+// Producción para expresiones lógicas NOT (not_expr)
 not_expr ::= BALTAZAR:sym rel_expr:re_expr {: RESULT = "<LOGIC><SYM>" + (String)sym + "</SYM><OP1>" +(String)re_expr + "</OP1></LOGIC>"; :}
            | rel_expr: re_expr {: RESULT = (String)re_expr; :};
-
+// Producción para expresiones relacionales (rel_expr)
 rel_expr ::= add_sub_expr:as_expr rel_op:sym rel_expr:re_expr {: RESULT = "<REL><OP1>" + (String)as_expr + "</OP1><SYM>" + (String)sym + "</SYM><OP2>" + (String)re_expr + "</OP2></REL>"; :}
            | add_sub_expr:as_expr {: RESULT =  (String)as_expr ; :} ;
-
+// Producción para operadores relacionales (rel_op)
 rel_op ::= ALABASTER:sym {: RESULT = "eq"; :}
          | BUSHY:sym {: RESULT = "ne"; :}
          | PEPPER:sym {: RESULT = "l"; :}
          | SUGARPLUM:sym {: RESULT = "g"; :}
          | WUNORSE:sym {: RESULT = "le"; :}
          | JINGLE:sym {: RESULT = "ge"; :};
-
+// Producción para expresiones aritméticas de suma y resta (add_sub_expr)
 add_sub_expr ::= mul_div_expr:md_expr add_sub_ops:sym add_sub_expr:as_expr {: RESULT = "<ARITH><OP1>" + (String)md_expr + "</OP1><SYM>"+ (String)sym + "</SYM><OP2>" + (String)as_expr + "</OP2></ARITH>";
                                                                             //Semantic.semanticExpr(symTabMgr, symbols, (String)RESULT, "int");
 :}
                | mul_div_expr:md_expr {: RESULT = (String)md_expr; :};
-
+// Producción para operadores de suma y resta (add_sub_ops)
 add_sub_ops ::= DASHER:sym {: RESULT = (String)sym; :}
               | DANCER:sym {: RESULT = (String)sym; :};
-
-
+// Producción para expresiones aritméticas de multiplicación y división (mul_div_expr)
 mul_div_expr ::= exp_expr:ex_expr mul_div_ops:sym mul_div_expr:md_expr {: RESULT = "<ARITH><OP1>" + (String)ex_expr + "</OP1><SYM>" + (String)sym + "</SYM><OP2>" + (String)md_expr + "</OP2></ARITH>"; :}
                | exp_expr:ex_expr {: RESULT = (String)ex_expr; :};
-
+// Producción para operadores de multiplicación y división (mul_div_ops)
 mul_div_ops ::= PRANCER:sym {: RESULT = (String)sym; :}
               | VIXEN:sym {: RESULT = (String)sym; :}
               | COMET:sym {: RESULT = (String)sym; :};
-
+// Producción para expresiones aritméticas de exponenciación (exp_expr)
 exp_expr ::= un_arith_expr:un_expr RUDOLPH:sym exp_expr:ex_expr {: RESULT = "<ARITH><OP1>" +(String)un_expr + "</OP1><SYM>" + (String)sym + "</SYM><OP2><<" + (String)ex_expr + "</OP2></ARITH>"; :}
            | un_arith_expr:un_expr {: RESULT = (String)un_expr; :};
-
+// Producción para expresiones unarias (un_arith_expr)
 un_arith_expr ::= un_arith_ops:sym un_arith_expr:un_exp {: RESULT = "<ARITH><SYM>" + (String)sym + "</SYM><OP1>" + (String)un_exp + "</OP1></ARITH>"; :}
                 | factor:fact {: RESULT = (String)fact; :};
-
+// Producción para operadores unarios (un_arith_ops)
 un_arith_ops ::= GRINCH:sym {: RESULT = (String)sym; :}
                | QUIEN:sym {: RESULT = (String)sym; :};
-
+// Producción para factores (factor)
 factor ::= immutable:immut {: RESULT = (String)immut; :}
          | mutable:mut {: RESULT = (String)mut; :};
-
+// Producción para variables (mutable)
 mutable ::= PERSONA:id {: RESULT = "<ID>" + (String)id + "</ID>"; :}
           | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = "<ARR_ELEM><ID>" + (String)id + "</ID><EXPR>" + (String)expr + "</EXPR></ARR_ELEM>" ; :};
-
+// Producción para constantes (immutable)
 immutable ::= ABRECUENTO expr:expr CIERRACUENTO {: RESULT = expr; :}
             | call:call {: RESULT = "<CALL>" + (String)call + "</CALL>"; :}
             | literal:lit {: RESULT = "<LITERAL>" + (String)lit + "</LITERAL>"; :};
-
+// Producción para llamadas a funciones (call)
 call ::= PERSONA:id ABRECUENTO args:args CIERRACUENTO {: RESULT = "<FUNC>" + (String)id + "</FUNC><ARGUMENTS>" + (String)args + "</ARGUMENTS>"; :};
-
+// Producción para los argumentos de funciones (args)
 args ::= arg_list:arg_l {: RESULT = (String)arg_l; :}
        | {: RESULT = ""; :};
-
+// Producción para listas de argumentos (arg_list)
 arg_list ::= expr:expr PINO arg_list:arg_l {: RESULT = "<ARG>" + (String)expr + "</ARG>" + (String)arg_l; :}
            | expr:expr {: RESULT = "<ARG>" + (String)expr + "</ARG>";:};
-
+// Producción para literales (literal)
 literal ::= L_SANTACLAUS: l_char {: RESULT = "char=" + (String)l_char; :}
           | L_FATHERCHRISTMAS: l_int {: RESULT = "int=" + (String)l_int; :}
           | L_KRISKRINGLE: l_flt {: RESULT = "float=" + (String)l_flt; :}
