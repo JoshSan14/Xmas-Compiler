@@ -23,12 +23,12 @@ public class Semantic {
     public final static String idRegex = "id=[\\w]+";
     public final static String allRegex = "(" + literalRegex + ")|(" + callRegex + ")|(" + idRegex + ")";
 
-    public static List<String> semanticArray(String input, String valueType) throws IllegalArgumentException {
+    public static List<String> semanticArray(String input, String typeCheck) throws IllegalArgumentException {
         List<String> result = new ArrayList<String>();
 
         // Validate valueType
-        if (!("int".equals(valueType) || "char".equals(valueType))) {
-            throw new IllegalArgumentException("Error Semántico: Tipo inválido especificado: " + valueType + ". Tipos aceptados: int o char.");
+        if (!("int".equals(typeCheck) || "char".equals(typeCheck))) {
+            throw new IllegalArgumentException("Error Semántico: Tipo inválido especificado: " + typeCheck + ". Tipos aceptados: int o char.");
         }
 
         if (input.startsWith("[") && input.endsWith("]")) {
@@ -36,13 +36,13 @@ public class Semantic {
             String[] elems = elemsString.split(", ");
 
             for (String elem : elems) {
-                Pattern pattern = Pattern.compile(valueType + "=(\\S+)");
+                Pattern pattern = Pattern.compile(typeCheck + "=(\\S+)");
                 Matcher matcher = pattern.matcher(elem);
 
                 if (matcher.find()) {
-                    result.add(valueType + "=" + matcher.group(1));
+                    result.add(typeCheck + "=" + matcher.group(1));
                 } else {
-                    throw new IllegalArgumentException("Error Semántico: Tipo inválido especificado: " + elem + ", array de tipo: " + valueType + ". Tipos aceptados: int o char.");
+                    throw new IllegalArgumentException("Error Semántico: Tipo inválido especificado: " + elem + ", array de tipo: " + typeCheck + ". Tipos aceptados: int o char.");
                 }
             }
         }

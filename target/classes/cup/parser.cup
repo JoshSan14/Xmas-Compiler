@@ -158,9 +158,7 @@ var_decl_init ::= var_init:var {: RESULT = (String)var; :}
 
 var_init ::= var_decl:var ENTREGA expr:expr {:
 RESULT = (String)var + "::" + (String)expr;
-System.out.println(RESULT);
 symList = Utils.splitMessage((String)RESULT, "::");
-System.out.println(symbols);
 ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTabMgr);
 :};
 
@@ -169,12 +167,17 @@ var_decl ::= LOCAL gen_id:id {: RESULT = (String)id; :};
 arr_decl_init ::= arr_init:arr {: RESULT = (String)arr; :}
                 | arr_decl:arr {: RESULT = (String)arr; :};
 
-arr_init ::= arr_decl:id ENTREGA ABREEMPAQUE expr_list:expr_l CIERRAEMPAQUE {: RESULT = (String)id + "::[" +(String)expr_l + "]"; :};
+arr_init ::= arr_decl:id ENTREGA ABREEMPAQUE expr_list:expr_l CIERRAEMPAQUE {:
+RESULT = (String)id + "::<ARRAY>" +(String)expr_l + "</ARRAY>";
+System.out.println(expr_l);
+symList = Utils.splitMessage((String)RESULT, "::");
+ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symTabMgr);
+:};
 
 arr_decl ::= LOCAL arr_id:id {: RESULT = (String)id; :};
 
-expr_list ::= expr:expr {: RESULT = (String)expr; :}
-            | expr:expr PINO expr_list:expr_l {: RESULT = (String)expr + ", " + (String)expr_l; :};
+expr_list ::= expr:expr {: RESULT = "<EXPR>" + (String)expr + "</EXPR>";:}
+            | expr:expr PINO expr_list:expr_l {: RESULT = "<EXPR>" + (String)expr + "</EXPR>" + (String)expr_l;:};
 
 /**********************************************************************************************************************/
 
@@ -222,7 +225,7 @@ return_stmt ::= ENVIA:rtrn expr_stmt:expr_stmt {: RESULT = (String)rtrn + (Strin
 
 break_stmt ::= CORTA:brk FINREGALO {: RESULT = (String)brk; :};
 
-expr ::= and_expr:an_expr GASPAR:sym expr:expr {: RESULT = "<LOGIC><OP1>" + (String)an_expr + "<OP1><SYM>" +(String)sym + "</SYM><OP2>" + (String)expr + "</OP2></LOGIC>";  :}
+expr ::= and_expr:an_expr GASPAR:sym expr:expr {: RESULT = "<LOGIC><OP1>" + (String)an_expr + "</OP1><SYM>" +(String)sym + "</SYM><OP2>" + (String)expr + "</OP2></LOGIC>";  :}
        | and_expr:an_expr {: RESULT = (String)an_expr ;  :};
 
 and_expr ::= not_expr:no_expr MELCHOR:sym and_expr:an_expr {: RESULT = "<LOGIC><OP1>" + (String)no_expr + "</OP1><SYM>"+ (String)sym + "</SYM><OP2>" + (String)an_expr + "</OP2></LOGIC>"; :}
@@ -260,17 +263,17 @@ mul_div_ops ::= PRANCER:sym {: RESULT = (String)sym; :}
 exp_expr ::= un_arith_expr:un_expr RUDOLPH:sym exp_expr:ex_expr {: RESULT = "<ARITH><OP1>" +(String)un_expr + "</OP1><SYM>" + (String)sym + "</SYM><OP2><<" + (String)ex_expr + "</OP2></ARITH>"; :}
            | un_arith_expr:un_expr {: RESULT = (String)un_expr; :};
 
-un_arith_expr ::= un_arith_ops:sym un_arith_expr:un_exp {: RESULT = "<ARITH><SYM>" + (String)sym + "</SYM><OP>" + (String)un_exp + "</OP></ARITH>"; :}
+un_arith_expr ::= un_arith_ops:sym un_arith_expr:un_exp {: RESULT = "<ARITH><SYM>" + (String)sym + "</SYM><OP1>" + (String)un_exp + "</OP1></ARITH>"; :}
                 | factor:fact {: RESULT = (String)fact; :};
 
 un_arith_ops ::= GRINCH:sym {: RESULT = (String)sym; :}
                | QUIEN:sym {: RESULT = (String)sym; :};
 
 factor ::= immutable:immut {: RESULT = (String)immut; :}
-         | mutable:mut {: RESULT = "<ID>" + (String)mut + "</ID>"; :};
+         | mutable:mut {: RESULT = (String)mut; :};
 
-mutable ::= PERSONA:id {: RESULT = (String)id; :}
-          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = (String)id + "[" + (String)expr + "]" ; :};
+mutable ::= PERSONA:id {: RESULT = "<ID>" + (String)id + "</ID>"; :}
+          | PERSONA:id ABREEMPAQUE expr:expr CIERRAEMPAQUE {: RESULT = "<ARR_ELEM><ID>" + (String)id + "</ID><EXPR>" + (String)expr + "</EXPR></ARR_ELEM>" ; :};
 
 immutable ::= ABRECUENTO expr:expr CIERRACUENTO {: RESULT = expr; :}
             | call:call {: RESULT = "<CALL>" + (String)call + "</CALL>"; :}
@@ -288,4 +291,4 @@ literal ::= L_SANTACLAUS: l_char {: RESULT = "char=" + (String)l_char; :}
           | L_FATHERCHRISTMAS: l_int {: RESULT = "int=" + (String)l_int; :}
           | L_KRISKRINGLE: l_flt {: RESULT = "float=" + (String)l_flt; :}
           | L_SANNICOLAS: l_bool {: RESULT = "bool=" + (String)l_bool; :}
-          | L_DEDMOROZ: l_str {: RESULT = "<string=\"" + (String)l_str + "\""; :};
+          | L_DEDMOROZ: l_str {: RESULT = "string=\"" + (String)l_str + "\""; :};

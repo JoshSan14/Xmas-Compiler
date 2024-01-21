@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class ExpressionTree {
-    //TODO: VERIFICAR QUE EL TIPO DE LA FUNCION RETORNE UN VALOR VALIDO CON EL TYPECHECK
     public static String checkExpressionType(String xmlString, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
 
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -26,7 +25,11 @@ public class ExpressionTree {
 
         System.out.println("Parsed XML Document:\n" + convertDocumentToString(document));
 
-        if (("LOGIC".equals(rootTagName) && typeCheck.equals("bool")) || ("REL".equals(rootTagName)) || (("ARITH").equals(rootTagName) && (typeCheck.equals("int") || typeCheck.equals("float")))) {
+        if ("ARRAY".equals(rootTagName) && ((typeCheck.equals("int") || typeCheck.equals("char")))) {
+            processArray(rootElement, typeCheck, symbols, manager);
+        } else if ("ARR_ELEM".equals(rootTagName)) {
+            processArrElem(rootElement, symbols, typeCheck, manager);
+        } else if (("LOGIC".equals(rootTagName) && typeCheck.equals("bool")) || ("REL".equals(rootTagName)) || (("ARITH").equals(rootTagName) && (typeCheck.equals("int") || typeCheck.equals("float")))) {
             traverseNode(rootElement, typeCheck, symbols, manager);
         } else {
             String rootText = rootElement.getTextContent();
@@ -43,11 +46,12 @@ public class ExpressionTree {
                 }
                 case "CALL" -> {
                     String funcName = rootElement.getElementsByTagName("FUNC").item(0).getTextContent();
-                    if(!Semantic.funcTypeCheck(funcName, manager, typeCheck)){
+                    if (!Semantic.funcTypeCheck(funcName, manager, typeCheck)) {
                         throw new IllegalArgumentException("Error Semántico en expresión aritmética: La funcion \"" + funcName + "\" retorna tipo \"" + typeCheck + "\"");
                     }
                     processCall(rootElement, symbols, manager);
                 }
+
             }
         }
 
@@ -74,7 +78,7 @@ public class ExpressionTree {
             } else if ("REL".equals(element.getTagName())) {
                 // Perform checkLogicChildren analysis for "LOGIC" element
                 try {
-                    checkRelChildren(element, typeCheck, symbols, manager);
+                    checkRelExpr(element, typeCheck, symbols, manager);
                 } catch (Exception e) {
                     // Handle the exception if needed
                     e.printStackTrace();
@@ -146,117 +150,85 @@ public class ExpressionTree {
             checkSemanticExpr(op1Element, symbols, typeCheck, manager);
             checkSemanticExpr(op2Element, symbols, typeCheck, manager);
 
-            String logicPattern = "REL|LOGIC|LITERAL|CALL|ID";
+            String childType1 = getChildTag(op1Element, symbols, manager);
+            String childType2 = getChildTag(op2Element, symbols, manager);
 
-            // Check if "OP1" is a "REL" expression
-//            boolean op1IsRel = hasChildElement(op1Element, logicPattern);
-//
-//            // Check if "OP2" is a "REL" expression (if it exists)
-//            boolean op2IsRel = hasChildElement(op2Element, logicPattern);
-//
-//            // Throw an exception if either "OP1" or "OP2" is not a "REL" expression
-//            if (!op1IsRel || !op2IsRel) {
-//                throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be REL expressions.");
-//            }
+            ArrayList<String> logicPattern = new ArrayList<>(Arrays.asList("REL", "LOGIC", "bool"));
+
+            if (childType2 != null) {
+                if (!(logicPattern.contains(childType1) && logicPattern.contains(childType2))) {
+                    throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be LOGIC expressions.");
+                }
+            } else {
+                if (!(logicPattern.contains(childType1))) {
+                    throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be LOGIC expressions.");
+                }
+            }
+
         } else {
             throw new IllegalArgumentException("Error Semántico: La expresión no es booleana");
         }
     }
 
-    private static void checkRelChildren(Element logicElement, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
-        Element op1Element = null;
-        Element op2Element = null;
-        Element symElement = null;
+    private static void checkRelExpr(Element element, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
+        if (typeCheck.equals("bool")) {
 
-        // Find "OP1", "OP2", and "SYM" elements
-        NodeList childNodes = logicElement.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node childNode = childNodes.item(i);
-            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element childElement = (Element) childNode;
-                if ("OP1".equals(childElement.getTagName())) {
-                    op1Element = childElement;
-                } else if ("OP2".equals(childElement.getTagName())) {
-                    op2Element = childElement;
-                } else if ("SYM".equals(childElement.getTagName())) {
-                    symElement = childElement;
+            Element op1Element = (Element) element.getElementsByTagName("OP1").item(0);
+            Element symElement = (Element) element.getElementsByTagName("SYM").item(0);
+            Element op2Element = (Element) element.getElementsByTagName("OP2").item(0);
+
+            String childType1 = getChildTag(op1Element, symbols, manager);
+            String symType = symElement.getTextContent();
+            String childType2 = getChildTag(op2Element, symbols, manager);
+
+            ArrayList<String> arithPattern = new ArrayList<>(Arrays.asList("ARITH", "int", "float"));
+            ArrayList<String> arithRelOps = new ArrayList<>(Arrays.asList("l", "g", "le", "ge"));
+            ArrayList<String> allRelOps = new ArrayList<>(Arrays.asList("eq", "ne"));
+
+            if (arithRelOps.contains(symType) && arithPattern.contains(childType1) && arithPattern.contains(childType2)) {
+                if ((childType1.equals("int") || childType1.equals("float")) && childType2.equals("ARITH")) {
+                    checkSemanticExpr(op1Element, symbols, childType1, manager);
+                } else if (childType1.equals("ARITH") && (childType2.equals("int") || childType2.equals("float"))) {
+                    checkSemanticExpr(op2Element, symbols, childType2, manager);
+                } else if ((childType1.equals("int") || childType1.equals("float") && childType2.equals(childType1))) {
+                    checkSemanticExpr(op1Element, symbols, childType1, manager);
+                    checkSemanticExpr(op2Element, symbols, childType1, manager);
+                } else {
+                    throw new IllegalArgumentException("Invalid structure: BOOOOYAH");
                 }
+            } else if (allRelOps.contains(symType)) {
+                if (childType1.equals("ARITH") && childType2.equals("ARITH")) {
+                    return;
+                } else if ((childType1.equals("int") || childType1.equals("float")) && childType2.equals("ARITH")) {
+                    checkSemanticExpr(op1Element, symbols, childType1, manager);
+                } else if (childType1.equals("ARITH") && (childType2.equals("int") || childType2.equals("float"))) {
+                    checkSemanticExpr(op2Element, symbols, childType2, manager);
+                } else if ((childType1.equals("LOGIC") || childType1.equals("REL")) && (childType2.equals("LOGIC") || childType2.equals("REL"))) {
+                    return;
+                } else if ((childType1.equals("bool")) && (childType2.equals("LOGIC") || childType2.equals("REL"))) {
+                    checkSemanticExpr(op1Element, symbols, childType1, manager);
+                } else if ((childType1.equals("LOGIC") || childType1.equals("REL")) && (childType2.equals("bool"))) {
+                    checkSemanticExpr(op2Element, symbols, childType2, manager);
+                } else if ((childType1.equals("int") || childType1.equals("float") || childType1.equals("char") || childType1.equals("string") || childType1.equals("bool")) && childType2.equals(childType1)) {
+                    checkSemanticExpr(op1Element, symbols, childType1, manager);
+                    checkSemanticExpr(op2Element, symbols, childType1, manager);
+                } else {
+                    throw new IllegalArgumentException("Invalid structure: BOOOOYAH");
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid structure: BOOOOYAH");
             }
+
+        } else {
+            throw new IllegalArgumentException("Invalid structure: BOOOOYAH");
         }
-        // Extract text content from "OP1" and "OP2"
-        assert op1Element != null;
-        String op1Text = op1Element.getFirstChild().getNodeValue();
-        assert op2Element != null;
-        String op2Text = op2Element.getFirstChild().getNodeValue();
-        assert symElement != null;
-        String symText = extractValue(symElement);
-        System.out.println(op2Text);
-
-        if (symText.matches("l|g|le|ge")) {
-
-            if (op1Element.getFirstChild().getNodeType() == Node.TEXT_NODE) {
-                String op1TagName = op1Element.getFirstChild().getNodeName();
-                switch (op1TagName) {
-                    case "ID" -> System.out.println("OP1 is an id: " + op1Text);
-                    case "CALL" -> System.out.println("OP1 is a call: " + op1Text);
-                    case "LITERAL" -> System.out.println("OP1 is a bool literal: " + op1Text);
-                }
-            }
-
-            // Perform operations based on the text content
-            if (op2Element.getFirstChild().getNodeType() == Node.TEXT_NODE) {
-                String op2TagName = op2Element.getFirstChild().getNodeName();
-                switch (op2TagName) {
-                    case "ID" -> System.out.println("OP2 is an id: " + op1Text);
-                    case "CALL" -> System.out.println("OP2 is a call: " + op1Text);
-                    case "LITERAL" -> System.out.println("OP2 is a bool literal: " + op1Text);
-                }
-            }
-
-        } else if (symText.matches("!=|==")) {
-
-            if (op1Element.getFirstChild().getNodeType() == Node.TEXT_NODE) {
-                String op1TagName = op1Element.getFirstChild().getNodeName();
-                switch (op1TagName) {
-                    case "ID" -> System.out.println("OP1 is an id: " + op1Text);
-                    case "CALL" -> System.out.println("OP1 is a call: " + op1Text);
-                    case "LITERAL" -> System.out.println("OP1 is a bool literal: " + op1Text);
-                }
-            }
-
-            // Perform operations based on the text content
-            if (op2Element.getFirstChild().getNodeType() == Node.TEXT_NODE) {
-                String op2TagName = op2Element.getFirstChild().getNodeName();
-                switch (op2TagName) {
-                    case "ID" -> System.out.println("OP2 is an id: " + op1Text);
-                    case "CALL" -> System.out.println("OP2 is a call: " + op1Text);
-                    case "LITERAL" -> System.out.println("OP2 is a bool literal: " + op1Text);
-                }
-            }
-        }
-
-        String logicPattern = "ARITH|LITERAL|CALL|ID|" + Semantic.allRegex;
-
-//        // Check if "OP1" is a "REL" expression
-//        boolean op1IsRel = hasChildElement(op1Element, logicPattern);
-//
-//        // Check if "OP2" is a "REL" expression (if it exists)
-//        boolean op2IsRel = hasChildElement(op2Element, logicPattern);
-//
-//        // Throw an exception if either "OP1" or "OP2" is not a "REL" expression
-//        if (!op1IsRel || !op2IsRel) {
-//            throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be ARITH expressions.");
-//        }
-
-        // Handle the case when both "OP1" and "OP2" are "REL" expressions
-        System.out.println("Both OP1 and OP2 are ARITH expressions.");
     }
 
-    private static void checkArithExpr(Element logicElement, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
+    private static void checkArithExpr(Element element, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
         if ((typeCheck.equals("int") || typeCheck.equals("float"))) {
             // Directly get "OP1" and "OP2" elements
-            Element op1Element = (Element) logicElement.getElementsByTagName("OP1").item(0);
-            Element op2Element = (Element) logicElement.getElementsByTagName("OP2").item(0);
+            Element op1Element = (Element) element.getElementsByTagName("OP1").item(0);
+            Element op2Element = (Element) element.getElementsByTagName("OP2").item(0);
 
             checkSemanticExpr(op1Element, symbols, typeCheck, manager);
             checkSemanticExpr(op2Element, symbols, typeCheck, manager);
@@ -264,11 +236,16 @@ public class ExpressionTree {
             String childType1 = getChildTag(op1Element, symbols, manager);
             String childType2 = getChildTag(op2Element, symbols, manager);
 
+            ArrayList<String> logicPattern = new ArrayList<>(Arrays.asList("ARITH", "int", "float"));
 
-            ArrayList<String> logicPattern = new ArrayList<>(Arrays.asList("ARITH", "ID", "INT", "FLOAT"));
-
-            if (!(logicPattern.contains(childType1) && logicPattern.contains(childType2))){
-                throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be ARITH expressions.");
+            if (childType2 != null){
+                if (!(logicPattern.contains(childType1) && logicPattern.contains(childType2))){
+                    throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be LOGIC expressions.");
+                }
+            } else {
+                if (!(logicPattern.contains(childType1))){
+                    throw new IllegalArgumentException("Invalid structure: Both OP1 and OP2 should be LOGIC expressions.");
+                }
             }
 
         } else {
@@ -277,7 +254,7 @@ public class ExpressionTree {
     }
 
     private static void checkSemanticExpr(Element element, Map<String, TabSymbol> symbols, String typeCheck, SymbolTableManager manager) throws Exception {
-        if (element.getFirstChild().getNodeType() == Node.ELEMENT_NODE) {
+        if ((element != null) && (element.getFirstChild().getNodeType() == Node.ELEMENT_NODE)) {
             String textContent = element.getFirstChild().getTextContent();
             String tagName = element.getFirstChild().getNodeName();
             switch (tagName) {
@@ -298,40 +275,57 @@ public class ExpressionTree {
                         throw new IllegalArgumentException("Error Semántico en expresión: El literal no es de tipo \"" + typeCheck + "\"");
                     }
                 }
+                case "ARR_ELEM" -> {
+                    processArrElem(element, symbols, typeCheck, manager);
+                }
+                case "ARITH" -> {
+                    checkArithExpr(element, typeCheck, symbols, manager);
+                }
+                case "REL" -> {
+                    checkRelExpr(element, typeCheck, symbols, manager);
+                }
+                case "LOGIC" -> {
+                    checkLogicExpr(element, typeCheck, symbols, manager);
+                }
             }
         }
     }
 
     private static String getChildTag(Element parentElement, Map<String, TabSymbol> symbols, SymbolTableManager manager) {
-        Node child = parentElement.getFirstChild();
+        if (parentElement != null) {
+            Node child = parentElement.getFirstChild();
 
-        // Check the first child node and perform actions based on its type and content
-        if (child != null && child.getNodeType() == Node.ELEMENT_NODE) {
-            String childTagName = child.getNodeName();
-            System.out.println("Element Node: " + childTagName);
+            // Check the first child node and perform actions based on its type and content
+            if (child != null && child.getNodeType() == Node.ELEMENT_NODE) {
+                String childTagName = child.getNodeName();
+                System.out.println("Element Node: " + childTagName);
 
-            if (childTagName.equals("LOGIC") || childTagName.equals("REL") || childTagName.equals("ARITH")){
-                return childTagName;
-            } else {
-                String childVal;
-                switch (childTagName) {
-                    case "ID" -> {
-                        childVal = child.getTextContent();
-                        return symbols.get(childVal).getType().toUpperCase();
-                    }
-                    case "LITERAL" -> {
-                        childVal = child.getTextContent();
-                        return Utils.splitMessage(childVal, "=").get(0).toUpperCase();
-                    }
-                    case "CALL" -> {
-                        childVal = child.getFirstChild().getTextContent();
-                        return manager.getSymbolTable(childVal).getReturnType().toUpperCase();
+                if (childTagName.equals("LOGIC") || childTagName.equals("REL") || childTagName.equals("ARITH")) {
+                    return childTagName;
+                } else {
+                    String childVal;
+                    switch (childTagName) {
+                        case "ID" -> {
+                            childVal = child.getTextContent();
+                            return symbols.get(childVal).getType();
+                        }
+                        case "LITERAL" -> {
+                            childVal = child.getTextContent();
+                            return Utils.splitMessage(childVal, "=").get(0);
+                        }
+                        case "CALL" -> {
+                            childVal = child.getFirstChild().getTextContent();
+                            return manager.getSymbolTable(childVal).getReturnType();
+                        }
+                        case "ARR_ELEM" -> {
+                            childVal = child.getFirstChild().getTextContent();
+                            return symbols.get(childVal).getType();
+                        }
                     }
                 }
             }
         }
-
-        return "No Child Nodes or Not an Element Node";
+        return null;
     }
 
     private static void processCall(Node callNode, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
@@ -370,7 +364,6 @@ public class ExpressionTree {
 
                         switch (argType) {
                             case "ID" -> {
-                                // TODO: COMPARE WITH VALUE IN LIST OF ARGS OF FUNCTION
                                 op = argElement.getTextContent().trim();
                                 type = symbols.get(op).getType();
                                 if (!type.equals(typeCheck)) {
@@ -390,20 +383,90 @@ public class ExpressionTree {
                                 processCall(argElement, symbols, manager);
                             }
                             case "ARITH" -> {
-                                if (!(typeCheck.equals("int") || typeCheck.equals("float"))) {
-                                    throw new IllegalArgumentException("NOT ARITH ");
-                                }
-                                System.out.println(argElement.getAttributes());
                                 checkArithExpr(argElement, typeCheck, symbols, manager);
                             }
-
-                            // Add cases for other tag types (ARITH, REL, LOGIC) if needed
+                            case "REL" -> {
+                                checkRelExpr(argElement, typeCheck, symbols, manager);
+                            }
+                            case "LOGIC" -> {
+                                checkLogicExpr(argElement, typeCheck, symbols, manager);
+                            }
                             default -> System.out.println("Unknown type: " + argType);
                         }
                     }
                 }
             }
         }
+    }
+
+    private static void processExpr(Element exprElement, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
+        Node childNode = exprElement.getFirstChild();
+
+        if (childNode != null && childNode.getNodeType() == Node.ELEMENT_NODE) {
+            Element childElement = (Element) childNode;
+            String childTagName = childElement.getTagName();
+
+            switch (childTagName) {
+                case "ID" -> {
+                    String id = childElement.getTextContent();
+                    if (!Semantic.idTypeCheck(symbols, id, typeCheck)) {
+                        throw new IllegalArgumentException("Error Semántico en expresión: La variable \"" + id + "\" no es de tipo \"" + typeCheck + "\"");
+                    }
+                }
+                case "LITERAL" -> {
+                    String literal = childElement.getTextContent();
+                    if (!Semantic.litTypeCheck(literal, typeCheck)) {
+                        throw new IllegalArgumentException("Error Semántico en expresión: El literal no es de tipo \"" + typeCheck + "\"");
+                    }
+                }
+                case "CALL" -> {
+                    processCall(childElement, symbols, manager);
+                }
+                case "ARITH" -> {
+                    checkArithExpr(childElement, typeCheck, symbols, manager);
+                }
+                case "REL" -> {
+                    checkRelExpr(childElement, typeCheck, symbols, manager);
+                }
+                case "LOGIC" -> {
+                    checkLogicExpr(childElement, typeCheck, symbols, manager);
+                }
+                case "ARR_ELEM" -> {
+                    processArrElem(childElement, symbols, typeCheck, manager);
+                }
+                default -> throw new IllegalArgumentException("Unsupported tag within EXPR: " + childTagName);
+            }
+        }
+    }
+
+    private static void processArray(Element arrayElement, String typeCheck, Map<String, TabSymbol> symbols, SymbolTableManager manager) throws Exception {
+        NodeList exprNodes = arrayElement.getElementsByTagName("EXPR");
+
+        for (int i = 0; i < exprNodes.getLength(); i++) {
+            Node exprNode = exprNodes.item(i);
+            if (exprNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element exprElement = (Element) exprNode;
+                processExpr(exprElement, typeCheck, symbols, manager);
+            }
+        }
+    }
+
+    private static void processArrElem(Element arrElemElement, Map<String, TabSymbol> symbols, String typeCheck, SymbolTableManager manager) throws Exception {
+        // Process the <ID> tag
+        Element idElement = (Element) arrElemElement.getElementsByTagName("ID").item(0);
+        String idText = idElement.getTextContent();
+
+        // Check semantic analysis for the <ID> tag
+        if (!Semantic.idTypeCheck(symbols, idText, typeCheck)) {
+            throw new IllegalArgumentException("Error Semántico: La variable \"" + idText + "\" no es de tipo \"" + typeCheck + "\"");
+        }
+
+        // Process the <EXPR> tag
+        Element exprElement = (Element) arrElemElement.getElementsByTagName("EXPR").item(0);
+
+        // Check semantic analysis for the <EXPR> tag
+        checkSemanticExpr(exprElement, symbols, typeCheck, manager);
+
     }
 }
 

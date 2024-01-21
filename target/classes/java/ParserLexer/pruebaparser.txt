@@ -14,8 +14,9 @@ function int beta(int i, float f){
 }
 
 function int func_a(int a, float b, int f) {
-    local float x|
-    local int xyz <= 4 + (beta(5, 5.0) + ((4 + (4 * (9 + 11 + x + 12)) * 4)))|
+    local int x|
+    local int gid[] <= [1, 2]|
+    local int xyz[] <= [gid[0], gid[1 + x + beta(gid[2], 1.0) + 4], x, gid[2]]|
 }
 
 

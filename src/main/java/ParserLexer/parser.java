@@ -945,9 +945,7 @@ class CUP$parser$actions {
 		Object expr = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
 RESULT = (String)var + "::" + (String)expr;
-System.out.println(RESULT);
 symList = Utils.splitMessage((String)RESULT, "::");
-System.out.println(symbols);
 ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTabMgr);
 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("var_init",51, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1000,7 +998,12 @@ ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTab
 		int expr_lleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int expr_lright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object expr_l = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		 RESULT = (String)id + "::[" +(String)expr_l + "]"; 
+		
+RESULT = (String)id + "::<ARRAY>" +(String)expr_l + "</ARRAY>";
+System.out.println(expr_l);
+symList = Utils.splitMessage((String)RESULT, "::");
+ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symTabMgr);
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("arr_init",52, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1024,7 +1027,7 @@ ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTab
 		int exprleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int exprright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object expr = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = (String)expr; 
+		 RESULT = "<EXPR>" + (String)expr + "</EXPR>";
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expr_list",29, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1039,7 +1042,7 @@ ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTab
 		int expr_lleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int expr_lright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object expr_l = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = (String)expr + ", " + (String)expr_l; 
+		 RESULT = "<EXPR>" + (String)expr + "</EXPR>" + (String)expr_l;
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expr_list",29, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1354,7 +1357,7 @@ ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTab
 		int exprleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int exprright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object expr = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = "<LOGIC><OP1>" + (String)an_expr + "<OP1><SYM>" +(String)sym + "</SYM><OP2>" + (String)expr + "</OP2></LOGIC>";  
+		 RESULT = "<LOGIC><OP1>" + (String)an_expr + "</OP1><SYM>" +(String)sym + "</SYM><OP2>" + (String)expr + "</OP2></LOGIC>";  
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expr",28, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1692,7 +1695,7 @@ ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTab
 		int un_expleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int un_expright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object un_exp = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = "<ARITH><SYM>" + (String)sym + "</SYM><OP>" + (String)un_exp + "</OP></ARITH>"; 
+		 RESULT = "<ARITH><SYM>" + (String)sym + "</SYM><OP1>" + (String)un_exp + "</OP1></ARITH>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("un_arith_expr",39, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1752,7 +1755,7 @@ ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTab
 		int mutleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int mutright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object mut = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = "<ID>" + (String)mut + "</ID>"; 
+		 RESULT = (String)mut; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("factor",41, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1764,7 +1767,7 @@ ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTab
 		int idleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int idright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = (String)id; 
+		 RESULT = "<ID>" + (String)id + "</ID>"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("mutable",42, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1779,7 +1782,7 @@ ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTab
 		int exprleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int exprright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object expr = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		 RESULT = (String)id + "[" + (String)expr + "]" ; 
+		 RESULT = "<ARR_ELEM><ID>" + (String)id + "</ID><EXPR>" + (String)expr + "</EXPR></ARR_ELEM>" ; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("mutable",42, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1938,7 +1941,7 @@ ExpressionTree.checkExpressionType((String)expr, symList.get(0), symbols, symTab
 		int l_strleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int l_strright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object l_str = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = "<string=\"" + (String)l_str + "\""; 
+		 RESULT = "string=\"" + (String)l_str + "\""; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("literal",47, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
