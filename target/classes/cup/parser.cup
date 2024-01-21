@@ -115,9 +115,10 @@ navidad ::= func_decl_list {: symTabMgr.printAllTables(); :};
 func_decl_list ::= func_decl
                  | func_decl func_decl_list {: :};
 
-func_decl ::= FUNCTION identifier:id ABRECUENTO param_list CIERRACUENTO block {:
+func_decl ::= FUNCTION identifier:id ABRECUENTO param_list CIERRACUENTO block:block {:
                          paramCount = 1;
-                         RESULT = "function::" + (String)id;
+                         RESULT = "function::" + (String)id + "::" + (String)block;
+                         System.out.println(RESULT);
                          Utils.splitAddFunc((String)RESULT, symbols, symTabMgr, new ArrayList<String>(parameters));
                          parameters.clear();:};
 
@@ -145,7 +146,7 @@ param ::= identifier:id {: RESULT = "parameter::" + (String)id + "::" + paramCou
                            parameters.add(params.get(1));
                            Utils.splitAddSym((String)RESULT, symbols); :};
 
-block ::= ABREREGALO stmt_list CIERRAREGALO
+block ::= ABREREGALO stmt_list:stmt_l CIERRAREGALO {: RESULT = "<BLOCK>" + (String)stmt_l + "</BLOCK>"; :}
         | error;
 
 init_stmt ::= var_decl_init:var FINREGALO {: RESULT = "variable::" + (String)var;
@@ -169,7 +170,6 @@ arr_decl_init ::= arr_init:arr {: RESULT = (String)arr; :}
 
 arr_init ::= arr_decl:id ENTREGA ABREEMPAQUE expr_list:expr_l CIERRAEMPAQUE {:
 RESULT = (String)id + "::<ARRAY>" +(String)expr_l + "</ARRAY>";
-System.out.println(expr_l);
 symList = Utils.splitMessage((String)RESULT, "::");
 ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symTabMgr);
 :};
@@ -186,16 +186,19 @@ stmt ::= init_stmt
        | assg_stmt
        | ctrl_struct_stmt
        | input_output_stmt
-       | return_stmt
+       | return_stmt:rtrn {: RESULT = (String)rtrn; :}
        | break_stmt;
 
-stmt_list ::= stmt stmt_list
+stmt_list ::= stmt:stmt stmt_list:stmt_l {: RESULT =  (String)stmt_l; :}
             | ;
 
-expr_stmt ::= expr:expr FINREGALO {: RESULT = expr; :}
+expr_stmt ::= expr:expr FINREGALO {: RESULT = (String)expr; :}
             | FINREGALO;
 
-assg_stmt ::= mutable:mut ENTREGA expr:expr FINREGALO {: RESULT = (String)mut + "<=" + (String)expr ; :};
+assg_stmt ::= mutable:mut ENTREGA expr:expr FINREGALO {:
+RESULT = "<ASSG>" + (String)mut + (String)expr + "</ASSG>";
+System.out.println(RESULT);
+:};
 
 ctrl_struct_stmt ::= conditional_stmt
                    | iter_stmt;
@@ -221,7 +224,7 @@ write_stmt ::= ESCUCHA:wrt ABRECUENTO PERSONA:id CIERRACUENTO {: RESULT = (Strin
 
 read_stmt ::= NARRA:prnt ABRECUENTO expr:expr CIERRACUENTO {: RESULT = (String)prnt + "(" + (String)expr + ")"; :};
 
-return_stmt ::= ENVIA:rtrn expr_stmt:expr_stmt {: RESULT = (String)rtrn + (String)expr_stmt; :};
+return_stmt ::= ENVIA:rtrn expr_stmt:expr_stmt {: RESULT = "<STMT><RETURN>" + (String)expr_stmt + "</RETURN></STMT>" ; :};
 
 break_stmt ::= CORTA:brk FINREGALO {: RESULT = (String)brk; :};
 

@@ -514,6 +514,9 @@ public class ExpressionTree {
                             case "LOGIC" -> {
                                 checkLogicExpr(argElement, typeCheck, symbols, manager);
                             }
+                            case "ARR_ELEM" -> {
+                                processArrElem(argElement, symbols, typeCheck, manager);
+                            }
                             default -> System.out.println("Tipo desconocido: " + argType);
                         }
                     }
