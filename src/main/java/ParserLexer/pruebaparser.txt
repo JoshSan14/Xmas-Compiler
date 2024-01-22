@@ -3,23 +3,22 @@
     return 0|
 }
 
-/_ Comentario Multilinea _/
-@ Comentario simple
-
 function int alfa(int y[], float u, int a){
 return 0|
 }
 
-function int beta(int i, float f){
+function float beta(int i, float f){
  return 0|
 }
 
 function int func_a(int a, float b, int f) {
     local int x|
-    local char c[]|
+    local char c|
+    local int array_i[] <= [1, 2, 3]|
+    local char array_a[] <= ['a','b','c']|
     local int gid[] <= [1, 2]|
-    x[1] <= 5|
-    local int xyz[] <= [gid[x], gid[1 + x + beta(gid[2], 1.0) + 4], x, gid[2]]|
-    return x + 1 * beta(1, 4.8)|
+    x <= 'a'|
+    local int xyz[] <= [true, gid[1 + x + beta(gid[2], 1) + 4], array_a['a'], gid[2]]|
+    return x + 1 * beta(1, 4.8) < 5|
 }
 

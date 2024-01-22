@@ -79,7 +79,7 @@ public class Semantic {
 
         // Valida el tipo de valor
         if (!("int".equals(typeCheck) || "char".equals(typeCheck))) {
-            throw new IllegalArgumentException("Error Semántico: Tipo inválido especificado: " + typeCheck + ". Tipos aceptados: int o char.");
+            System.out.println(Utils.ANSI_RED + "Error Semántico: Tipo inválido especificado: " + typeCheck + ". Tipos aceptados: int o char." + Utils.ANSI_RESET);
         }
 
         // Verifica si la cadena de entrada comienza y termina con corchetes
@@ -101,7 +101,7 @@ public class Semantic {
                     result.add(typeCheck + "=" + matcher.group(1));
                 } else {
                     // Lanza una excepción si el formato del elemento no es válido
-                    throw new IllegalArgumentException("Error Semántico: Tipo inválido especificado: " + elem + ", array de tipo: " + typeCheck + ". Tipos aceptados: int o char.");
+                    System.out.println(Utils.ANSI_RED + "Error Semántico: Tipo inválido especificado: " + typeCheck + ". Tipos aceptados: int o char." + Utils.ANSI_RESET);
                 }
             }
         }
