@@ -111,10 +111,10 @@ start with navidad; // No terminal de inicio
 /**********************************************************************************************************************/
 // Simbolo inicial
 navidad ::= sacoderegalos {: symTabMgr.printAllTables(); :};
-// Producciones para lista de declaraciones de funciones (sacoderegalos)
+// Producciones para lista de declaraciones de funciones (func_decl_list)
 sacoderegalos ::= confites
                  | confites sacoderegalos {: :};
-// Producción para declaración de una función (confites)
+// Producción para declaración de una función (func_decl)
 confites ::= FUNCTION identifier:id ABRECUENTO trajesdesanta CIERRACUENTO caja:caja {:
                          paramCount = 1;
                          RESULT = "function::" + (String)id + "::" + (String)caja;
@@ -125,62 +125,62 @@ confites ::= FUNCTION identifier:id ABRECUENTO trajesdesanta CIERRACUENTO caja:c
 // Producciones para identificador (identifier)
 identifier ::= bolasdenavidad:id {: RESULT = (String)id; :}
              | bolsanavidena:id {: RESULT = (String)id; :};
-// Producciones para tipo de dato (personajedenavidad)
+// Producciones para tipo de dato (type)
 personajedenavidad ::= FATHERCHRISTMAS: t_int {: RESULT = (String)t_int; :}
        | KRISKRINGLE: t_flt {: RESULT = (String)t_flt; :}
        | SANTACLAUS: t_char {: RESULT = (String)t_char; :}
        | DEDMOROZ: t_str {: RESULT = (String)t_str; :}
        | SANNICOLAS: t_bool {: RESULT = (String)t_bool; :};
-// Producción para identificador generalizado (bolasdenavidad)
+// Producción para identificador generalizado (gen_id)
 bolasdenavidad ::= personajedenavidad:tp PERSONA:id {: RESULT = (String)tp + "::" + (String)id; :};
-// Producción para identificador de arreglo (bolsanavidena)
+// Producción para identificador de arreglo (arr_id)
 bolsanavidena ::= bolasdenavidad:id ABREEMPAQUE CIERRAEMPAQUE {: RESULT = (String)id + "::UND" ;  :}
          | bolasdenavidad:id ABREEMPAQUE tamales:size CIERRAEMPAQUE {: RESULT = (String)id + "::" + (String)size; :};
-// Producciones para lista de parámetros (trajesdesanta)
+// Producciones para lista de parámetros (param_list)
 trajesdesanta ::= lucesdenavidad:par {: RESULT = (String)par; :}
              | lucesdenavidad:par PINO trajesdesanta:par_l {: RESULT = (String)par + ", " + (String)par_l; :}
              | {: RESULT = ""; :};
-// Producción para parámetro (lucesdenavidad)
+// Producción para parámetro (param)
 lucesdenavidad ::= identifier:id {: RESULT = "parameter::" + (String)id + "::" + paramCount;
                            paramCount++;
                            ArrayList<String> params = Utils.splitMessage((String)RESULT,"::");
                            parameters.add(params.get(1));
                            Utils.splitAddSym((String)RESULT, symbols); :};
-// Producción para bloque de código (caja)
+// Producción para bloque de código (block)
 caja ::= ABREREGALO villancicos:stmt_l CIERRAREGALO {: RESULT = "<BLOCK>" + (String)stmt_l + "</BLOCK>"; :}
         | error;
-// Producción para inicialización de variable (jueguetes)
+// Producción para inicialización de variable (init_stmt)
 jueguetes ::= barbadesanta:var FINREGALO {: RESULT = "variable::" + (String)var;
                                              Utils.splitAddSym((String)RESULT, symbols); :}
             | regalo:arr FINREGALO {: RESULT = "array::" + (String)arr;
                                              Utils.splitAddSym((String)RESULT, symbols); :};
-// Producciones para inicialización de variable (barbadesanta)
+// Producciones para inicialización de variable (var_decl_init)
 barbadesanta ::= carrito:var {: RESULT = (String)var; :}
                 | portal:var {: RESULT = (String)var; :};
-// Producción para inicialización de variable (carrito)
+// Producción para inicialización de variable (var_init)
 carrito ::= portal:var ENTREGA tamales:tamales {:
 RESULT = (String)var + "::" + (String)tamales;
 symList = Utils.splitMessage((String)RESULT, "::");
 ExpressionTree.checkExpressionType((String)tamales, symList.get(0), symbols, symTabMgr);
 :};
-// Producción para declaración de variable local (portal)
+// Producción para declaración de variable local (var_decl)
 portal ::= LOCAL bolasdenavidad:id {: RESULT = (String)id; :};
-// Producciones para inicialización/declaración de arreglo (regalo)
+// Producciones para inicialización/declaración de arreglo (arr_decl_init)
 regalo ::= decoracionnavidena:arr {: RESULT = (String)arr; :}
                 | listadedeseos:arr {: RESULT = (String)arr; :};
-// Producción para inicialización de arreglo (decoracionnavidena)
+// Producción para inicialización de arreglo (arr_init)
 decoracionnavidena ::= listadedeseos:id ENTREGA ABREEMPAQUE trineo:expr_l CIERRAEMPAQUE {:
 RESULT = (String)id + "::<ARRAY>" +(String)expr_l + "</ARRAY>";
 symList = Utils.splitMessage((String)RESULT, "::");
 ExpressionTree.checkExpressionType(symList.get(3), symList.get(0), symbols, symTabMgr);
 :};
-// Producción para declaración de arreglo local (listadedeseos)
+// Producción para declaración de arreglo local (arr_decl)
 listadedeseos ::= LOCAL bolsanavidena:id {: RESULT = (String)id; :};
-// Producción para lista de expresiones (trineo)
+// Producción para lista de expresiones (expr_list)
 trineo ::= tamales:tamales {: RESULT = "<EXPR>" + (String)tamales + "</EXPR>";:}
             | tamales:tamales PINO trineo:expr_l {: RESULT = "<EXPR>" + (String)tamales + "</EXPR>" + (String)expr_l;:};
 /**********************************************************************************************************************/
-// Producciones para las sentencias (celebracionesnavidenas)
+// Producciones para las sentencias (stmt)
 celebracionesnavidenas ::= jueguetes {: RESULT = "<INIT></INIT>";:}
        | frio {: RESULT = "<EXPR_S><EXPR_S>"; :}
        | nieve:assg {:
@@ -192,104 +192,104 @@ celebracionesnavidenas ::= jueguetes {: RESULT = "<INIT></INIT>";:}
        | contarhistorianavidena {: RESULT = "<IO></IO>"; :}
        | nochebuena:rtrn {: RESULT = "<RETURN>" + (String)rtrn + "</RETURN>"; :}
        | amigosecreto:brk {:RESULT = "<BREAK></BREAK>"; :};
-// Producciones para listas de sentencias (villancicos)
+// Producciones para listas de sentencias (expr_stmt)
 villancicos ::= celebracionesnavidenas:celebracionesnavidenas villancicos:stmt_l {: RESULT = (String)celebracionesnavidenas + (String)stmt_l ; :}
             | ;
-// Producción para las sentencias de expresiones (frio)
+// Producción para las sentencias de expresiones (assg_stmt)
 frio ::= tamales:tamales FINREGALO {: RESULT = (String)tamales; :}
             | FINREGALO;
-// Producción para las sentencias de asignación (nieve)
+// Producción para las sentencias de asignación (conditional_stmt)
 nieve ::= romperregalo:mut ENTREGA tamales:tamales FINREGALO {:RESULT = (String)mut + "<EXPR>" + (String)tamales + "</EXPR>";:};
 // Producción para las estructuras de control (carta)
 carta ::= observarregalos
                    | peliculanavidena;
-// Producción para las sentencias condicionales (observarregalos)
+// Producción para las sentencias condicionales (elif_else)
 observarregalos ::= ELFO ABRECUENTO tamales CIERRACUENTO caja papelderegalo;
 // Producción para las cláusulas elif y else (papelderegalo)
 papelderegalo ::= HADA ABRECUENTO tamales CIERRACUENTO caja papelderegalo
             | DUENDE caja
             | ;
-// Producción para las instrucciones de iteración (peliculanavidena)
+// Producción para las instrucciones de iteración (iter_stmt)
 peliculanavidena ::= familia
             | regalomanual;
-// Producción para las sentencias de bucle do-until (familia)
+// Producción para las sentencias de bucle do-until (do_until_loop)
 familia ::= HACE caja REVISA ABRECUENTO tamales CIERRACUENTO FINREGALO;
-// Producción para las sentencias de bucle for (regalomanual)
+// Producción para las sentencias de bucle for (for_loop)
 regalomanual ::= ENVUELVE ABRECUENTO carrito FINREGALO tamales FINREGALO tamales CIERRACUENTO caja
            | ENVUELVE ABRECUENTO nieve tamales FINREGALO tamales CIERRACUENTO caja;
-// Producción para las sentencias de entrada y salida (contarhistorianavidena)
+// Producción para las sentencias de entrada y salida (input_output_stmt)
 contarhistorianavidena ::= leercarta:celebracionesnavidenas FINREGALO {: RESULT = celebracionesnavidenas; :}
                     | escribircarta:celebracionesnavidenas FINREGALO {: RESULT = celebracionesnavidenas; :};
-// Producción para las sentencias de escritura (escribircarta)
+// Producción para las sentencias de escritura (write_stmt)
 escribircarta ::= ESCUCHA:wrt ABRECUENTO PERSONA:id CIERRACUENTO {: RESULT = (String)wrt + "(" + (String)id + ")"; :};
-// Producción para las sentencias de lectura (leercarta)
+// Producción para las sentencias de lectura (read_stmt)
 leercarta ::= NARRA:prnt ABRECUENTO tamales:tamales CIERRACUENTO {: RESULT = (String)prnt + "(" + (String)tamales + ")"; :};
-// Producción para las sentencias de retorno (nochebuena)
+// Producción para las sentencias de retorno (return_stmt)
 nochebuena ::= ENVIA:rtrn frio:frio {: RESULT = (String)frio; :};
-// Producción para las sentencias de ruptura (amigosecreto)
+// Producción para las sentencias de ruptura (break_stmt)
 amigosecreto ::= CORTA:brk FINREGALO {: RESULT = (String)brk; :};
-// Producción para expresiones lógicas (tamales)
+// Producción para expresiones lógicas (expr)
 tamales ::= regaloprin:an_expr GASPAR:sym tamales:tamales {: RESULT = "<LOGIC><OP1>" + (String)an_expr + "</OP1><SYM>" +(String)sym + "</SYM><OP2>" + (String)tamales + "</OP2></LOGIC>";  :}
        | regaloprin:an_expr {: RESULT = (String)an_expr ;  :};
-// Producción para expresiones lógicas AND (regaloprin)
+// Producción para expresiones lógicas AND (and_expr)
 regaloprin ::= alegria:no_expr MELCHOR:sym regaloprin:an_expr {: RESULT = "<LOGIC><OP1>" + (String)no_expr + "</OP1><SYM>"+ (String)sym + "</SYM><OP2>" + (String)an_expr + "</OP2></LOGIC>"; :}
            | alegria:no_expr {: RESULT = (String)no_expr; :};
-// Producción para expresiones lógicas NOT (alegria)
+// Producción para expresiones lógicas NOT (not_expr)
 alegria ::= BALTAZAR:sym galletas:re_expr {: RESULT = "<LOGIC><SYM>" + (String)sym + "</SYM><OP1>" +(String)re_expr + "</OP1></LOGIC>"; :}
            | galletas: re_expr {: RESULT = (String)re_expr; :};
-// Producción para expresiones relacionales (galletas)
+// Producción para expresiones relacionales (rel_expr)
 galletas ::= juegos:as_expr dulces:sym galletas:re_expr {: RESULT = "<REL><OP1>" + (String)as_expr + "</OP1><SYM>" + (String)sym + "</SYM><OP2>" + (String)re_expr + "</OP2></REL>"; :}
            | juegos:as_expr {: RESULT =  (String)as_expr ; :} ;
-// Producción para operadores relacionales (dulces)
+// Producción para operadores relacionales (rel_op)
 dulces ::= ALABASTER:sym {: RESULT = "eq"; :}
          | BUSHY:sym {: RESULT = "ne"; :}
          | PEPPER:sym {: RESULT = "l"; :}
          | SUGARPLUM:sym {: RESULT = "g"; :}
          | WUNORSE:sym {: RESULT = "le"; :}
          | JINGLE:sym {: RESULT = "ge"; :};
-// Producción para expresiones aritméticas de suma y resta (juegos)
+// Producción para expresiones aritméticas de suma y resta (add_sub_expr)
 juegos ::= sobre:md_expr jueguetenuevo:sym juegos:as_expr {: RESULT = "<ARITH><OP1>" + (String)md_expr + "</OP1><SYM>"+ (String)sym + "</SYM><OP2>" + (String)as_expr + "</OP2></ARITH>";
                                                                             //Semantic.semanticExpr(symTabMgr, symbols, (String)RESULT, "int");
 :}
                | sobre:md_expr {: RESULT = (String)md_expr; :};
-// Producción para operadores de suma y resta (jueguetenuevo)
+// Producción para operadores de suma y resta (add_sub_ops)
 jueguetenuevo ::= DASHER:sym {: RESULT = (String)sym; :}
               | DANCER:sym {: RESULT = (String)sym; :};
-// Producción para expresiones aritméticas de multiplicación y división (sobre)
+// Producción para expresiones aritméticas de multiplicación y división (mul_div_expr)
 sobre ::= estrella:ex_expr campanas:sym sobre:md_expr {: RESULT = "<ARITH><OP1>" + (String)ex_expr + "</OP1><SYM>" + (String)sym + "</SYM><OP2>" + (String)md_expr + "</OP2></ARITH>"; :}
                | estrella:ex_expr {: RESULT = (String)ex_expr; :};
-// Producción para operadores de multiplicación y división (campanas)
+// Producción para operadores de multiplicación y división (mul_div_ops)
 campanas ::= PRANCER:sym {: RESULT = (String)sym; :}
               | VIXEN:sym {: RESULT = (String)sym; :}
               | COMET:sym {: RESULT = (String)sym; :};
-// Producción para expresiones aritméticas de exponenciación (estrella)
+// Producción para expresiones aritméticas de exponenciación (exp_expr)
 estrella ::= juguetesenelarbol:un_expr RUDOLPH:sym estrella:ex_expr {: RESULT = "<ARITH><OP1>" +(String)un_expr + "</OP1><SYM>" + (String)sym + "</SYM><OP2><<" + (String)ex_expr + "</OP2></ARITH>"; :}
            | juguetesenelarbol:un_expr {: RESULT = (String)un_expr; :};
-// Producción para expresiones unarias (juguetesenelarbol)
+// Producción para expresiones unarias (un_arith_expr)
 juguetesenelarbol ::= regalocomprado:sym juguetesenelarbol:un_exp {: RESULT = "<ARITH><SYM>" + (String)sym + "</SYM><OP1>" + (String)un_exp + "</OP1></ARITH>"; :}
                 | cenafamiliar:fact {: RESULT = (String)fact; :};
-// Producción para operadores unarios (regalocomprado)
+// Producción para operadores unarios (un_arith_ops)
 regalocomprado ::= GRINCH:sym {: RESULT = (String)sym; :}
                | QUIEN:sym {: RESULT = (String)sym; :};
-// Producción para factores (cenafamiliar)
+// Producción para factores (factor)
 cenafamiliar ::= tiendadejuguetes:immut {: RESULT = (String)immut; :}
          | romperregalo:mut {: RESULT = (String)mut; :};
-// Producción para variables (romperregalo)
+// Producción para variables (mutable)
 romperregalo ::= PERSONA:id {: RESULT = "<ID>" + (String)id + "</ID>"; :}
           | PERSONA:id ABREEMPAQUE tamales:tamales CIERRAEMPAQUE {: RESULT = "<ARR_ELEM><ID>" + (String)id + "</ID><EXPR>" + (String)tamales + "</EXPR></ARR_ELEM>" ; :};
-// Producción para constantes (tiendadejuguetes)
+// Producción para constantes (immutable)
 tiendadejuguetes ::= ABRECUENTO tamales:tamales CIERRACUENTO {: RESULT = tamales; :}
             | devolverregalo:devolverregalo {: RESULT = "<CALL>" + (String)devolverregalo + "</CALL>"; :}
             | adornos:lit {: RESULT = "<LITERAL>" + (String)lit + "</LITERAL>"; :};
-// Producción para llamadas a funciones (devolverregalo)
+// Producción para llamadas a funciones (call)
 devolverregalo ::= PERSONA:id ABRECUENTO pelotasarbol:pelotasarbol CIERRACUENTO {: RESULT = "<FUNC>" + (String)id + "</FUNC><ARGUMENTS>" + (String)pelotasarbol + "</ARGUMENTS>"; :};
-// Producción para los argumentos de funciones (pelotasarbol)
+// Producción para los argumentos de funciones (args)
 pelotasarbol ::= hojasarbol:arg_l {: RESULT = (String)arg_l; :}
        | {: RESULT = ""; :};
-// Producción para listas de argumentos (hojasarbol)
+// Producción para listas de argumentos (arg_list)
 hojasarbol ::= tamales:tamales PINO hojasarbol:arg_l {: RESULT = "<ARG>" + (String)tamales + "</ARG>" + (String)arg_l; :}
            | tamales:tamales {: RESULT = "<ARG>" + (String)tamales + "</ARG>";:};
-// Producción para literales (adornos)
+// Producción para literales (literal)
 adornos ::= L_SANTACLAUS: l_char {: RESULT = "char=" + (String)l_char; :}
           | L_FATHERCHRISTMAS: l_int {: RESULT = "int=" + (String)l_int; :}
           | L_KRISKRINGLE: l_flt {: RESULT = "float=" + (String)l_flt; :}

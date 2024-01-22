@@ -140,7 +140,7 @@ public class Semantic {
         TabSymbol id = symbols.get(idName);
 
         if (id == null) {
-            throw new IllegalArgumentException("Error Semántico: La variable \"" + idName + "\" no está definida en el ámbito actual.");
+            System.out.println("Error Semántico: La variable \"" + idName + "\" no está definida en el ámbito actual.");
         }
 
         // Obtiene el tipo de la variable identificada
@@ -162,7 +162,7 @@ public class Semantic {
         String litType = Utils.splitMessage(literal, "=").get(0);
 
         if (litType.isEmpty()) {
-            throw new IllegalArgumentException("Error Semántico: El formato del literal es incorrecto: " + literal);
+            System.out.println("Error Semántico: El formato del literal es incorrecto: " + literal);
         }
 
         // Verifica si el tipo del literal coincide con el tipo especificado

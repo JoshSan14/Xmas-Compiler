@@ -57,7 +57,7 @@ public class BlockTree {
 
             // Verificar si el BLOQUE tiene un elemento RETURN
             if (!hasReturn) {
-                throw new IllegalArgumentException("Error: El bloque de función para " + funcName + " no contiene una declaración RETURN.");
+                System.out.println("Error: El bloque de función para " + funcName + " no contiene una declaración RETURN.");
             }
 
             // Si necesita convertir el documento a una cadena para fines de depuración o registro
@@ -176,7 +176,7 @@ public class BlockTree {
             // Procesar la expresión utilizando checkSemanticExpr u otra lógica
             checkSemanticExpr(expressionElement, symbols, typeCheck, manager);
         } else {
-            throw new IllegalArgumentException("Error: No se encontró el elemento <EXPR> en la declaración de asignación.");
+            System.out.println("Error: No se encontró el elemento <EXPR> en la declaración de asignación.");
         }
     }
 
