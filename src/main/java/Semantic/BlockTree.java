@@ -211,6 +211,4 @@ public class BlockTree {
             System.out.println(Utils.ANSI_RED + "Error: No se encontró el elemento <EXPR> en la declaración de asignación." + Utils.ANSI_RESET);
         }
     }
-
-
 }

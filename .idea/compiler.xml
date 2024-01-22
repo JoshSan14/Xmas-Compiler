@@ -12,7 +12,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="compiler" options="--add-exports java.xml/com.sun.org.apache.xerces.internal.util=ALL-UNNAMED" />
+      <module name="compiler" options="" />
     </option>
   </component>
 </project>
