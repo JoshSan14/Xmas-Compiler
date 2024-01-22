@@ -621,4 +621,3 @@ public class ExpressionTree {
         checkSemanticExpr(exprElement, symbols, typeCheck, manager);
     }
 }
-
